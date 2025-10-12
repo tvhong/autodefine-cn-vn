@@ -2,7 +2,7 @@
 
 ## Phase 1: Project Setup & Core Structure
 
-- [ ] **Task 1**: Setup project structure and manifest - Create addon structure with manifest.json, **init**.py
+- [x] **Task 1**: Setup project structure and manifest - Create addon structure with manifest.json, **init**.py
 - [ ] **Task 2**: Implement basic configuration system - Create config.json, config_manager.py for user settings
 - [ ] **Task 3**: Setup Anki UI hooks - Implement ui_hooks.py to integrate with Anki's card editor
 - [ ] **Task 4**: Create a build system to build a release package that's consumable by Anki
@@ -39,20 +39,14 @@ autodefine-cn-vn/
 ├── __init__.py                   # Main addon entry point
 ├── config.json                   # Default configuration
 ├── config.md                     # Configuration documentation
-├── core/
-│   ├── __init__.py
-│   ├── translator.py            # Translation logic (Chinese to Vietnamese)
-│   ├── field_manager.py         # Anki field population logic
-│   └── ui_hooks.py              # Anki UI integration hooks
-├── services/
-│   ├── __init__.py
-│   ├── chinese_dict.py          # Chinese dictionary lookup
-│   ├── vietnamese_dict.py       # Vietnamese translation service
-│   └── audio_service.py         # Audio pronunciation fetching
-├── utils/
-│   ├── __init__.py
-│   ├── text_processor.py        # Text processing utilities
-│   └── config_manager.py        # Configuration management
+├── translator.py                 # Translation logic (Chinese to Vietnamese)
+├── field_manager.py              # Anki field population logic
+├── ui_hooks.py                   # Anki UI integration hooks
+├── chinese_dict.py               # Chinese dictionary lookup
+├── vietnamese_dict.py            # Vietnamese translation service
+├── audio_service.py              # Audio pronunciation fetching
+├── text_processor.py             # Text processing utilities
+├── config_manager.py             # Configuration management
 └── tests/
     ├── test_translator.py
     ├── test_field_manager.py

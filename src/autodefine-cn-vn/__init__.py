@@ -10,11 +10,11 @@ from aqt.utils import showInfo
 from aqt.qt import QAction
 from anki.hooks import addHook
 
-# Import core modules when they are created
-# from .core.translator import ChineseVietnameseTranslator
-# from .core.field_manager import FieldManager
-# from .core.ui_hooks import setup_ui_hooks
-# from .utils.config_manager import ConfigManager
+# Import modules when they are created
+# from .translator import ChineseVietnameseTranslator
+# from .field_manager import FieldManager
+# from .ui_hooks import setup_ui_hooks
+# from .config_manager import ConfigManager
 
 __version__ = "1.0.0"
 __author__ = "AutoDefine CN-VN Team"
