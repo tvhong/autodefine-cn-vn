@@ -31,7 +31,17 @@ def mock_mw():
             "max_retries": 3,
         },
     }
-    with patch("autodefine_cn_vn.config_manager.mw", mw):
+
+    # Mock field_map for utils.py functions
+    # field_map returns a dict: {field_name: (index, field_obj)}
+    mw.col.models.field_map.return_value = {
+        "Chinese": (0, MagicMock()),
+        "Pinyin": (1, MagicMock()),
+        "Vietnamese": (2, MagicMock()),
+        "Audio": (3, MagicMock()),
+    }
+
+    with patch("autodefine_cn_vn.config_manager.mw", mw), patch("autodefine_cn_vn.utils.mw", mw):
         yield mw
 
 
@@ -43,14 +53,6 @@ def mock_editor(mock_mw):
     # Mock note with fields
     note = MagicMock()
     note.fields = ["你好", "", "", ""]  # Chinese, Pinyin, Vietnamese, Audio
-    note.model.return_value = {
-        "flds": [
-            {"name": "Chinese"},
-            {"name": "Pinyin"},
-            {"name": "Vietnamese"},
-            {"name": "Audio"},
-        ]
-    }
     editor.note = note
 
     # Mock editor methods
@@ -79,12 +81,10 @@ class TestGetChineseText:
 
     def test_returns_empty_string_when_field_not_found(self, mock_editor, mock_mw):
         """Test that get_chinese_text returns empty string when field is not found."""
-        # Change field names so Chinese field doesn't exist
-        mock_editor.note.model.return_value = {
-            "flds": [
-                {"name": "Word"},
-                {"name": "Definition"},
-            ]
+        # Change field_map so Chinese field doesn't exist (raises KeyError)
+        mock_mw.col.models.field_map.return_value = {
+            "Word": (0, MagicMock()),
+            "Definition": (1, MagicMock()),
         }
 
         chinese_text = get_chinese_text(mock_editor)
@@ -119,7 +119,7 @@ class TestInsertIntoField:
         assert mock_editor.note.fields[1] == "new"
         mock_editor.loadNote.assert_called_once()
 
-    def test_handles_field_not_found(self, mock_editor):
+    def test_handles_field_not_found(self, mock_editor, mock_mw):
         """Test that insert_into_field handles field not found gracefully."""
         with patch("autodefine_cn_vn.ui_hooks.tooltip") as mock_tooltip:
             insert_into_field(mock_editor, "text", "NonExistentField", overwrite=True)

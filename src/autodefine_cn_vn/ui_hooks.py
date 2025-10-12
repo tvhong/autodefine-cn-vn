@@ -7,6 +7,7 @@ from anki.notes import Note
 from aqt.utils import tooltip
 
 from autodefine_cn_vn.config_manager import ConfigManager
+from autodefine_cn_vn.utils import get_field, set_field
 
 if TYPE_CHECKING:
     from aqt.editor import Editor
@@ -106,12 +107,10 @@ def get_chinese_text(editor: "Editor") -> str:
     if not note:
         return ""
 
-    # Find the field index by name
-    for idx, field_name in enumerate(note.model()["flds"]):
-        if field_name["name"] == chinese_field_name and idx < len(note.fields):
-            return note.fields[idx].strip()
-
-    return ""
+    try:
+        return get_field(note, chinese_field_name).strip()
+    except KeyError:
+        return ""
 
 
 def insert_into_field(
@@ -129,32 +128,18 @@ def insert_into_field(
     if not note:
         return
 
-    # Find the field index by name
-    field_idx = None
-    for idx, field in enumerate(note.model()["flds"]):
-        if field["name"] == field_name:
-            field_idx = idx
-            break
-
-    if field_idx is None:
+    try:
+        if overwrite:
+            set_field(note, field_name, text)
+        else:
+            current_value = get_field(note, field_name)
+            set_field(note, field_name, current_value + text)
+    except KeyError:
         tooltip(
             f"AutoDefine: Field '{field_name}' not found in note type. "
             f"Please check your configuration.",
             period=5000,
         )
         return
-
-    if field_idx >= len(note.fields):
-        tooltip(
-            f"AutoDefine: Field index {field_idx} out of range. "
-            f"Note has {len(note.fields)} fields.",
-            period=5000,
-        )
-        return
-
-    if overwrite:
-        note.fields[field_idx] = text
-    else:
-        note.fields[field_idx] += text
 
     editor.loadNote()
