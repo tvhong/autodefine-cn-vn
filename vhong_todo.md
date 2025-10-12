@@ -13,15 +13,24 @@
 - [x] Make ui_hooks a class?
 - [x] Create field utility functions (get_field, set_field) with tests
 
-## 0.2: Pull definition from remote website
+## 0.2.0: Pull definition from remote website
+
+- [ ] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
+- [ ] Parse pinyin, audio, and Vietnamese definition from it
+- [ ] Fill out fields with pinyin and Vietnamese definition
 
 ### 0.2.1: Clean up
 
 - [ ] Make ConfigManager a singleton
 - [ ] Create a hook so that when the config is edited, run ConfigManager.load_config again
 
-## 0.3: Nice to have features
+## 0.3.0: Support audio
 
+- [ ] Download the audio into appropriate place
+- [ ] Link it to the card
+
+## 0.x: Nice to have features
+
+- [ ] Have a nice icon
 - [ ] Support default tags such as "language::chinese" as well
 - [ ] Make this more generic for different type of translators
-- [ ] Have a nice icon
