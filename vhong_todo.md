@@ -15,7 +15,7 @@
 
 ## 0.2.0: Pull definition from remote website
 
-- [ ] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
+- [x] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
 - [ ] Parse pinyin, audio, and Vietnamese definition from it
 - [ ] Fill out fields with pinyin and Vietnamese definition
 
