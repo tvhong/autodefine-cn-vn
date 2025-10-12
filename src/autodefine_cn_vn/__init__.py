@@ -10,15 +10,16 @@ from aqt import mw
 from aqt.qt import QAction
 from aqt.utils import showInfo
 
+from autodefine_cn_vn.ui_hooks import init_ui_hooks
+
 __version__ = "1.0.0"
 __author__ = "Vy Hong"
 
 
 def on_addon_loaded():
     """Initialize the addon when Anki loads."""
-    # TODO: Initialize configuration manager
-    # TODO: Setup UI hooks for card editor
-    # TODO: Register keyboard shortcuts
+    # Initialize UI hooks for card editor
+    init_ui_hooks()
     showInfo("AutoDefine Chinese-Vietnamese addon loaded successfully!")
 
 
