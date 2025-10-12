@@ -44,11 +44,13 @@ uv run pytest tests/test_specific.py::test_function_name
 
 Anki addons must follow a specific structure:
 
+- Anki addon development doc is at https://addon-docs.ankiweb.net/intro.html
 - The addon code lives in `src/autodefine_cn_vn/` during development
 - The `__init__.py` is the entry point that Anki loads when the addon is activated
 - `config.json` defines default configuration (field mappings, API settings, shortcuts)
 - For distribution, the entire `autodefine_cn_vn/` folder is packaged into an `.ankiaddon` file (which is a renamed .zip file)
 - When installed, Anki extracts the addon to its `addons21/` directory
+- You can use ../autodefine_oxfordlearnersdictionaries as reference
 
 ### Anki Addon Structure
 
