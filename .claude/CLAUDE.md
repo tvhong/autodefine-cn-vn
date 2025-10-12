@@ -66,30 +66,6 @@ Default configuration is in `config.json`:
 - API settings: Translation source URL template and network settings
 - Shortcuts: Keyboard shortcuts for triggering auto-definition
 
-## Manual Testing with Anki
-
-To test the addon in Anki:
-
-1. Find Anki's addon directory: Open Anki → Tools → Add-ons → View Files
-2. Create a symlink from Anki's addon directory to your local `src/autodefine_cn_vn` directory:
-   ```bash
-   # Mac example
-   ln -s /Users/vy/workplace/autodefine-cn-vn/src/autodefine_cn_vn \
-         ~/Library/Application\ Support/Anki2/addons21/autodefine_cn_vn
-   ```
-3. Create a Test profile in Anki (for safety)
-4. Run Anki from terminal to see debug output:
-
-   ```bash
-   # Mac
-   /Applications/Anki.app/Contents/MacOS/anki -p Test
-
-   # Linux
-   /usr/local/bin/anki -p Test
-   ```
-
-5. Make code changes, restart Anki, and test
-
 ## Key Technical Considerations
 
 - **Anki API compatibility**: This addon targets Anki 24.0.0+ (uses aqt, anki modules)
