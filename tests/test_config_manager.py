@@ -1,0 +1,123 @@
+"""Tests for ConfigManager module."""
+
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from autodefine_cn_vn.config_manager import ConfigManager
+
+
+@pytest.fixture
+def mock_mw():
+    """Mock Anki's main window."""
+    mw = MagicMock()
+    mw.addonManager.getConfig.return_value = {
+        "field_mapping": {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        },
+        "shortcuts": {"auto_define_shortcut": "Ctrl+Alt+D"},
+        "api_settings": {
+            "source": "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+            "timeout_seconds": 10,
+            "max_retries": 3,
+        },
+    }
+    return mw
+
+
+class TestConfigManager:
+    """Test suite for ConfigManager."""
+
+    def test_init_loads_config(self, mock_mw):
+        """Test that ConfigManager loads config on initialization."""
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            mock_mw.addonManager.getConfig.assert_called_once_with("autodefine_cn_vn")
+            assert config_manager.config is not None
+
+    def test_init_handles_none_config(self, mock_mw):
+        """Test that ConfigManager handles None config gracefully."""
+        mock_mw.addonManager.getConfig.return_value = None
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            assert config_manager.config == {}
+
+    def test_get_field_mapping_returns_correct_values(self, mock_mw):
+        """Test that get_field_mapping returns the correct field mapping."""
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            field_mapping = config_manager.get_field_mapping()
+
+            assert field_mapping["chinese_field"] == "Chinese"
+            assert field_mapping["pinyin_field"] == "Pinyin"
+            assert field_mapping["vietnamese_field"] == "Vietnamese"
+            assert field_mapping["audio_field"] == "Audio"
+
+    def test_get_field_mapping_returns_defaults_on_missing_key(self, mock_mw):
+        """Test that get_field_mapping returns defaults when key is missing."""
+        mock_mw.addonManager.getConfig.return_value = {}
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            field_mapping = config_manager.get_field_mapping()
+
+            assert field_mapping["chinese_field"] == "Chinese"
+            assert field_mapping["pinyin_field"] == "Pinyin"
+            assert field_mapping["vietnamese_field"] == "Vietnamese"
+            assert field_mapping["audio_field"] == "Audio"
+
+    def test_get_shortcuts_returns_correct_values(self, mock_mw):
+        """Test that get_shortcuts returns the correct shortcuts."""
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            shortcuts = config_manager.get_shortcuts()
+
+            assert shortcuts["auto_define_shortcut"] == "Ctrl+Alt+D"
+
+    def test_get_shortcuts_returns_defaults_on_missing_key(self, mock_mw):
+        """Test that get_shortcuts returns defaults when key is missing."""
+        mock_mw.addonManager.getConfig.return_value = {}
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            shortcuts = config_manager.get_shortcuts()
+
+            assert shortcuts["auto_define_shortcut"] == "Ctrl+Alt+D"
+
+    def test_get_api_settings_returns_correct_values(self, mock_mw):
+        """Test that get_api_settings returns the correct API settings."""
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            api_settings = config_manager.get_api_settings()
+
+            assert api_settings["source"] == "http://2.vndic.net/index.php?word={}&dict=cn_vi"
+            assert api_settings["timeout_seconds"] == 10
+            assert api_settings["max_retries"] == 3
+
+    def test_get_api_settings_returns_defaults_on_missing_key(self, mock_mw):
+        """Test that get_api_settings returns defaults when key is missing."""
+        mock_mw.addonManager.getConfig.return_value = {}
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            api_settings = config_manager.get_api_settings()
+
+            assert api_settings["source"] == "http://2.vndic.net/index.php?word={}&dict=cn_vi"
+            assert api_settings["timeout_seconds"] == 10
+            assert api_settings["max_retries"] == 3
+
+    def test_reload_config_refreshes_from_anki(self, mock_mw):
+        """Test that reload_config refreshes config from Anki."""
+        with patch("autodefine_cn_vn.config_manager.mw", mock_mw):
+            config_manager = ConfigManager()
+            initial_call_count = mock_mw.addonManager.getConfig.call_count
+
+            # Simulate external config change
+            mock_mw.addonManager.getConfig.return_value = {
+                "field_mapping": {"chinese_field": "UpdatedChinese"}
+            }
+
+            config_manager.reload_config()
+
+            assert mock_mw.addonManager.getConfig.call_count == initial_call_count + 1
+            assert config_manager.config["field_mapping"]["chinese_field"] == "UpdatedChinese"
