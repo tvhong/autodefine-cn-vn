@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 
 from anki.hooks import addHook
+from anki.notes import Note
 from aqt.utils import tooltip
 
 from autodefine_cn_vn.config_manager import ConfigManager
@@ -124,7 +125,7 @@ def insert_into_field(
         field_name: Name of the field to insert into
         overwrite: If True, replace existing content; if False, append
     """
-    note = editor.note
+    note: Note | None = editor.note
     if not note:
         return
 
