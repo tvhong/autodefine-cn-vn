@@ -10,12 +10,6 @@ from aqt import mw
 from aqt.qt import QAction
 from aqt.utils import showInfo
 
-# Import modules when they are created
-# from .translator import ChineseVietnameseTranslator
-# from .field_manager import FieldManager
-# from .ui_hooks import setup_ui_hooks
-# from .config_manager import ConfigManager
-
 __version__ = "1.0.0"
 __author__ = "Vy Hong"
 
