@@ -3,9 +3,10 @@
 ## Phase 1: Project Setup & Core Structure
 
 - [x] **Task 1**: Setup project structure and manifest - Create addon structure with manifest.json, **init**.py
-- [ ] **Task 2**: Implement basic configuration system - Create config.json, config_manager.py for user settings
-- [ ] **Task 3**: Setup Anki UI hooks - Implement ui_hooks.py to integrate with Anki's card editor
-- [ ] **Task 4**: Create a build system to build a release package that's consumable by Anki
+- [ ] **Task 2**: Setup lint and test using uv
+- [ ] **Task 3**: Implement basic configuration system - Create config.json, config_manager.py for user settings
+- [ ] **Task 4**: Setup Anki UI hooks - Implement ui_hooks.py to integrate with Anki's card editor
+- [ ] **Task 5**: Create a build system to build a release package that's consumable by Anki
 
 ## Phase 2: Translation Core
 
@@ -63,4 +64,3 @@ autodefine-cn-vn/
 - **Custom note types**: Provide pre-configured Chinese-Vietnamese note templates
 
 ## Current Status: Ready to start Task 1
-
