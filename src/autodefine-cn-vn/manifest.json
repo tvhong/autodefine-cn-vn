@@ -1,27 +1,5 @@
 {
-    "package": "autodefine_cn_vn",
-    "name": "AutoDefine Chinese-Vietnamese",
-    "mod": 1234567890,
-    "author": "AutoDefine CN-VN Team",
-    "conflicts": [],
-    "description": "Automatically define Chinese words with Vietnamese translations in Anki cards. Supports pinyin, definitions, and audio pronunciation.",
-    "homepage": "https://github.com/vy/autodefine-cn-vn",
-    "tags": ["chinese", "vietnamese", "translation", "dictionary"],
-    "min_point_version": 45,
-    "max_point_version": 0,
-    "branch_index": 0,
-    "update_enabled": true,
-    "disabled": false,
-    "config": {
-        "field_mapping": {
-            "chinese_field": "Chinese",
-            "vietnamese_field": "Vietnamese",
-            "pinyin_field": "Pinyin",
-            "definition_field": "Definition",
-            "audio_field": "Audio"
-        },
-        "auto_define_shortcut": "Ctrl+Alt+D",
-        "enable_audio": true,
-        "enable_offline_cache": true
-    }
+  "package": "autodefine-cn-vn",
+  "name": "AutoDefine Chinese-Vietnamese"
 }
+
