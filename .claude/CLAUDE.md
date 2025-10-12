@@ -11,11 +11,13 @@ This is an Anki addon that automatically populates Chinese vocabulary cards with
 This project uses `uv` for dependency management and `just` for task running.
 
 ### Setup
+
 ```bash
 uv sync --extra dev
 ```
 
 ### Common Commands (via justfile)
+
 ```bash
 just lint          # Run ruff linter
 just lint-fix      # Auto-fix linting issues
@@ -30,6 +32,7 @@ just clean         # Remove generated files and caches
 ```
 
 ### Running Individual Tests
+
 ```bash
 uv run pytest tests/test_specific.py
 uv run pytest tests/test_specific.py::test_function_name
@@ -37,30 +40,28 @@ uv run pytest tests/test_specific.py::test_function_name
 
 ## Architecture
 
+### Anki Addon Package Structure
+
+Anki addons must follow a specific structure:
+
+- The addon code lives in `src/autodefine_cn_vn/` during development
+- The `__init__.py` is the entry point that Anki loads when the addon is activated
+- `config.json` defines default configuration (field mappings, API settings, shortcuts)
+- For distribution, the entire `autodefine_cn_vn/` folder is packaged into an `.ankiaddon` file (which is a renamed .zip file)
+- When installed, Anki extracts the addon to its `addons21/` directory
+
 ### Anki Addon Structure
 
-Anki addons use a specific structure where the addon code lives in `src/autodefine_cn_vn/`. The main entry point (`__init__.py`) registers hooks with Anki's event system:
+The main entry point (`__init__.py`) registers hooks with Anki's event system:
 
 - **profileLoaded hook**: Initializes the addon when an Anki profile loads
 - **Menu integration**: Adds settings to Anki's Tools menu
 - **Field mapping**: Maps addon outputs to configurable Anki card fields
 
-### Planned Module Architecture
-
-The addon will be organized into these core modules:
-
-- **config_manager.py**: Manages user configuration (field mappings, API settings, shortcuts)
-- **translator.py**: Orchestrates the translation workflow (Chinese → Vietnamese)
-- **text_processor.py**: Handles Chinese text processing (segmentation, character handling)
-- **chinese_dict.py**: Fetches Chinese definitions and explanations
-- **vietnamese_dict.py**: Fetches Vietnamese translations from vndic.net
-- **field_manager.py**: Populates Anki card fields with translation results
-- **ui_hooks.py**: Integrates with Anki's card editor UI
-- **audio_service.py**: Downloads and embeds pronunciation audio
-
 ### Configuration
 
 Default configuration is in `config.json`:
+
 - Field mapping: Defines which Anki fields receive which data (Chinese, Pinyin, Vietnamese, Audio)
 - API settings: Translation source URL template and network settings
 - Shortcuts: Keyboard shortcuts for triggering auto-definition
@@ -78,6 +79,7 @@ To test the addon in Anki:
    ```
 3. Create a Test profile in Anki (for safety)
 4. Run Anki from terminal to see debug output:
+
    ```bash
    # Mac
    /Applications/Anki.app/Contents/MacOS/anki -p Test
@@ -85,6 +87,7 @@ To test the addon in Anki:
    # Linux
    /usr/local/bin/anki -p Test
    ```
+
 5. Make code changes, restart Anki, and test
 
 ## Key Technical Considerations
