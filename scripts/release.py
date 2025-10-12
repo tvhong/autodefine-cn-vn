@@ -246,11 +246,7 @@ def run_ci_checks() -> bool:
 def create_commit(version: Version) -> None:
     """Create a git commit for the version bump."""
     run_command(["git", "add", "pyproject.toml"])
-    commit_message = (
-        f"Bump version to {version}\n\n"
-        "🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\n"
-        "Co-Authored-By: Claude <noreply@anthropic.com>"
-    )
+    commit_message = f"Bump version to {version}\n\n"
     run_command(["git", "commit", "-m", commit_message])
 
 
