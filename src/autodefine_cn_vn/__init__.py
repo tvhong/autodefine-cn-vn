@@ -5,10 +5,10 @@ This addon automatically populates Chinese vocabulary cards with Vietnamese tran
 pinyin pronunciation, definitions, and audio pronunciation.
 """
 
-from aqt import mw
-from aqt.utils import showInfo
-from aqt.qt import QAction
 from anki.hooks import addHook
+from aqt import mw
+from aqt.qt import QAction
+from aqt.utils import showInfo
 
 # Import modules when they are created
 # from .translator import ChineseVietnameseTranslator
@@ -47,4 +47,3 @@ addHook("profileLoaded", on_addon_loaded)
 # Setup menu when main window is available
 if mw:
     setup_menu()
-
