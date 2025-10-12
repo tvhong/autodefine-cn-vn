@@ -60,6 +60,10 @@ The main entry point (`__init__.py`) registers hooks with Anki's event system:
 - **Menu integration**: Adds settings to Anki's Tools menu
 - **Field mapping**: Maps addon outputs to configurable Anki card fields
 
+### Styles
+
+- Use newspaper ordering structure whenever possible.
+
 ### Configuration
 
 Default configuration is in `config.json`:
