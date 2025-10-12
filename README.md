@@ -18,7 +18,7 @@ An Anki addon that automatically fills card fields with Chinese word definitions
 ## Installation
 
 1. Download the latest release from [Releases](../../releases)
-2. In Anki, go to `Tools` ’ `Add-ons` ’ `Install from file...`
+2. In Anki, go to `Tools` > `Add-ons` > `Install from file...`
 3. Select the downloaded `.ankiaddon` file
 4. Restart Anki
 
@@ -26,7 +26,7 @@ An Anki addon that automatically fills card fields with Chinese word definitions
 
 After installation:
 
-1. Go to `Tools` ’ `Add-ons`
+1. Go to `Tools` > `Add-ons`
 2. Select "AutoDefine Chinese-Vietnamese"
 3. Click `Config` to customize:
    - Field mappings
