@@ -86,10 +86,10 @@ Steps:
 2. Then create a symlink from Anki's add-on directory to your "ir" directory.
    For example:
    - My Anki add-on directory is `$HOME/.local/share/Anki2/addons21`.
-   - My local incremental reading workspace is `$HOME/workplace/incremental-reading`.
+   - My local workspace is `$HOME/workplace/autodefine-cn-vn`.
    - Then to add my local workspace as an Anki add-on, I'd run
    ```shell
-   ln -s $HOME/workplace/incremental-reading/ir  $HOME/.local/share/Anki2/addons21/ir
+   ln -s $HOME/workplace/autodefine-cn-vn/src/autodefine_cn_vn/  $HOME/.local/share/Anki2/addons21/autodefine_cn_vn
    ```
 3. Restart Anki.
 
