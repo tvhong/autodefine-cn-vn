@@ -26,7 +26,7 @@ class ConfigManager:
 
     def __init__(self):
         """Initialize the config manager and load configuration."""
-        self.config = self._load_config()
+        self._config = self._load_config()
 
     def get_field_mapping(self) -> dict[str, str]:
         """Get field mapping configuration.
@@ -54,16 +54,21 @@ class ConfigManager:
 
     def reload_config(self) -> None:
         """Reload configuration from Anki's addon manager."""
-        self.config = self._load_config()
+        self._config = self._load_config()
 
     def _load_config(self) -> dict[str, Any]:
         """Load configuration from Anki's addon manager.
 
         Returns:
-            Configuration dictionary, or empty dict if config is None.
+            Configuration dictionary
         """
-        config = mw.addonManager.getConfig(__name__.split(".")[0])
-        return config if config is not None else {}
+        addon_name = __name__.split(".")[0]
+        config = mw.addonManager.getConfig(addon_name)
+
+        if not config:
+            raise ValueError("Failed to load configuration for AutoDefine CN-VN addon.")
+
+        return config
 
     def _get_with_default(self, key: str, default: Any) -> Any:
         """Get a config value with a default fallback.
@@ -75,4 +80,4 @@ class ConfigManager:
         Returns:
             Configuration value or default
         """
-        return self.config.get(key, default)
+        return self._config.get(key, default)
