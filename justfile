@@ -64,3 +64,31 @@ build:
 run-anki:
     @echo "Starting Anki for manual testing..."
     @echo "TODO: Implement Anki launch script"
+
+# Get current version from pyproject.toml
+version:
+    @uv run python scripts/release.py --help | grep "Current version" || grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/'
+
+# Release a new version (e.g., just release 0.1.2)
+release VERSION:
+    uv run python scripts/release.py {{VERSION}}
+
+# Release a patch version (e.g., 0.1.0 -> 0.1.1)
+release-patch:
+    uv run python scripts/release.py --patch
+
+# Release a minor version (e.g., 0.1.0 -> 0.2.0)
+release-minor:
+    uv run python scripts/release.py --minor
+
+# Release a major version (e.g., 0.1.0 -> 1.0.0)
+release-major:
+    uv run python scripts/release.py --major
+
+# Dry run release to see what would happen
+release-dry-run VERSION:
+    uv run python scripts/release.py {{VERSION}} --dry-run
+
+# Dry run patch release
+release-patch-dry:
+    uv run python scripts/release.py --patch --dry-run
