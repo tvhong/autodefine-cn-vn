@@ -1,0 +1,17 @@
+{
+  "field_mapping": {
+    "chinese_field": "Chinese",
+    "pinyin_field": "Pinyin",
+    "vietnamese_field": "Vietnamese",
+    "audio_field": "Audio"
+  },
+  "shortcuts": {
+    "auto_define_shortcut": "Ctrl+Alt+D"
+  },
+  "api_settings": {
+    "source": "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+    "timeout_seconds": 10,
+    "max_retries": 3
+  }
+}
+
