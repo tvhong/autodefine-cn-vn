@@ -11,3 +11,6 @@ wheels/
 
 # Pytest coverage reports
 .coverage
+
+# Anki's updated config files
+meta.json
