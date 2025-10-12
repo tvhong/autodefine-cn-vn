@@ -20,7 +20,6 @@ def on_addon_loaded():
     """Initialize the addon when Anki loads."""
     # Initialize UI hooks for card editor
     init_ui_hooks()
-    showInfo("AutoDefine Chinese-Vietnamese addon loaded successfully!")
 
 
 def setup_menu():
