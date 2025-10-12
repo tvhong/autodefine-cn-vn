@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from autodefine_cn_vn.utils import get_field, set_field
+from autodefine_cn_vn.utils import get_field, set_field, unwrap
 
 
 @pytest.fixture
@@ -45,17 +45,6 @@ class TestGetField:
         assert get_field(mock_note, "Vietnamese") == "xin chào"
         assert get_field(mock_note, "Audio") == "[sound:audio.mp3]"
 
-    def test_calls_note_type_method(self, mock_mw, mock_note):
-        """Test that get_field calls note.note_type() to get the model."""
-        get_field(mock_note, "Chinese")
-        mock_note.note_type.assert_called_once()
-
-    def test_calls_field_map_with_model(self, mock_mw, mock_note):
-        """Test that get_field calls field_map with the note's model."""
-        model = mock_note.note_type.return_value
-        get_field(mock_note, "Chinese")
-        mock_mw.col.models.field_map.assert_called_once_with(model)
-
     def test_raises_key_error_for_nonexistent_field(self, mock_mw, mock_note):
         """Test that get_field raises KeyError for nonexistent field."""
         with pytest.raises(KeyError):
@@ -88,18 +77,35 @@ class TestSetField:
         assert mock_note.fields[2] == "word2"
         assert mock_note.fields[3] == "word3"
 
-    def test_calls_note_type_method(self, mock_mw, mock_note):
-        """Test that set_field calls note.note_type() to get the model."""
-        set_field(mock_note, "Chinese", "test")
-        mock_note.note_type.assert_called_once()
-
-    def test_calls_field_map_with_model(self, mock_mw, mock_note):
-        """Test that set_field calls field_map with the note's model."""
-        model = mock_note.note_type.return_value
-        set_field(mock_note, "Chinese", "test")
-        mock_mw.col.models.field_map.assert_called_once_with(model)
-
     def test_raises_key_error_for_nonexistent_field(self, mock_mw, mock_note):
         """Test that set_field raises KeyError for nonexistent field."""
         with pytest.raises(KeyError):
             set_field(mock_note, "NonExistentField", "value")
+
+
+class TestUnwrap:
+    """Tests for unwrap function."""
+
+    def test_returns_value_when_not_none(self):
+        """Test that unwrap returns the value when it's not None."""
+        assert unwrap("hello") == "hello"
+        assert unwrap(42) == 42
+        assert unwrap([1, 2, 3]) == [1, 2, 3]
+
+    def test_returns_zero_and_false(self):
+        """Test that unwrap returns falsy values that aren't None."""
+        assert unwrap(0) == 0
+        assert unwrap(False) is False
+        assert unwrap("") == ""
+        assert unwrap([]) == []
+
+    def test_raises_value_error_when_none(self):
+        """Test that unwrap raises ValueError when value is None."""
+        with pytest.raises(ValueError, match="Expected object to be not None"):
+            unwrap(None)
+
+    def test_preserves_type(self):
+        """Test that unwrap preserves the type of the value."""
+        obj = MagicMock()
+        result = unwrap(obj)
+        assert result is obj

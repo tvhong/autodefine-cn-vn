@@ -18,8 +18,7 @@ def get_field(note: Note, field_name: str) -> str:
         KeyError: If the field name does not exist in the note type
     """
     model = unwrap(note.note_type())
-    mw.col = unwrap(mw.col)
-    index, _ = mw.col.models.field_map(model)[field_name]
+    index, _ = unwrap(mw.col).models.field_map(model)[field_name]
     return note.fields[index]
 
 
