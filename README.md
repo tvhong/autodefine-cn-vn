@@ -56,8 +56,8 @@ Default field configuration:
 
 ### Requirements
 
-- Python 3.11+
-- Anki 2.1.x
+- Python 3.12+
+- Anki 25.09.x
 
 ### Setup
 
