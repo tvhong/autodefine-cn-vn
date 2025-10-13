@@ -55,14 +55,13 @@ clean:
     find . -type d -name __pycache__ -exec rm -rf {} +
     find . -type f -name "*.pyc" -delete
 
-# Build Anki addon package
-build:
-    uv run python scripts/build.py
-
 # Clean build artifacts
 clean-build:
     rm -rf dist/ build/
-    rm -rf src/autodefine_cn_vn/vendor/
+
+# Build Anki addon package
+build:
+    uv run python scripts/build.py
 
 # Run Anki with the addon for testing
 run-anki:
