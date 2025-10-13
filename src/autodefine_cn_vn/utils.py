@@ -2,6 +2,18 @@
 
 from anki.notes import Note
 from aqt import mw
+from aqt.utils import tooltip
+
+
+def show_tooltip_and_print(message: str, period: int = 3000) -> None:
+    """Show a tooltip in Anki UI and print the same message to stdout.
+
+    Args:
+        message: The message to display and print
+        period: How long to show the tooltip in milliseconds (default: 3000)
+    """
+    tooltip(message, period=period)
+    print(message)
 
 
 def get_field(note: Note, field_name: str) -> str:

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from autodefine_cn_vn.utils import get_field, set_field, unwrap
+from autodefine_cn_vn.utils import get_field, set_field, show_tooltip_and_print, unwrap
 
 
 @pytest.fixture
@@ -109,3 +109,37 @@ class TestUnwrap:
         obj = MagicMock()
         result = unwrap(obj)
         assert result is obj
+
+
+class TestShowTooltipAndPrint:
+    """Tests for show_tooltip_and_print function."""
+
+    def test_calls_tooltip_with_message(self):
+        """Test that show_tooltip_and_print calls tooltip with the message."""
+        with (
+            patch("autodefine_cn_vn.utils.tooltip") as mock_tooltip,
+            patch("builtins.print") as mock_print,
+        ):
+            show_tooltip_and_print("Test message")
+
+            mock_tooltip.assert_called_once_with("Test message", period=3000)
+            mock_print.assert_called_once_with("Test message")
+
+    def test_calls_tooltip_with_custom_period(self):
+        """Test that show_tooltip_and_print respects custom period."""
+        with (
+            patch("autodefine_cn_vn.utils.tooltip") as mock_tooltip,
+            patch("builtins.print") as mock_print,
+        ):
+            show_tooltip_and_print("Test message", period=5000)
+
+            mock_tooltip.assert_called_once_with("Test message", period=5000)
+            mock_print.assert_called_once_with("Test message")
+
+    def test_prints_to_stdout(self):
+        """Test that show_tooltip_and_print prints the message to stdout."""
+        with patch("autodefine_cn_vn.utils.tooltip"), patch("builtins.print") as mock_print:
+            message = "AutoDefine: Successfully filled fields"
+            show_tooltip_and_print(message)
+
+            mock_print.assert_called_once_with(message)
