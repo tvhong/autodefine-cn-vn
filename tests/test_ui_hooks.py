@@ -138,123 +138,128 @@ class TestInsertIntoField:
         # Should not raise an error, just return early
 
 
+@pytest.fixture
+def mock_fetch_webpage():
+    """Mock fetch_webpage function."""
+    with patch("autodefine_cn_vn.ui_hooks.fetch_webpage") as mock:
+        yield mock
+
+
+@pytest.fixture
+def mock_parse_dictionary_content():
+    """Mock parse_dictionary_content function."""
+    with patch("autodefine_cn_vn.ui_hooks.parse_dictionary_content") as mock:
+        yield mock
+
+
+@pytest.fixture
+def mock_tooltip():
+    """Mock tooltip function."""
+    with patch("autodefine_cn_vn.ui_hooks.tooltip") as mock:
+        yield mock
+
+
 class TestAutoDefine:
     """Tests for auto_define function."""
 
-    def test_fills_fields_with_fetched_data(self, mock_editor):
+    def test_fills_fields_with_fetched_data(
+        self, mock_editor, mock_fetch_webpage, mock_parse_dictionary_content, mock_tooltip
+    ):
         """Test that auto_define fills fields with data fetched from the dictionary."""
-        with (
-            patch("autodefine_cn_vn.ui_hooks.fetch_webpage") as mock_fetch,
-            patch("autodefine_cn_vn.ui_hooks.parse_dictionary_content") as mock_parse,
-            patch("autodefine_cn_vn.ui_hooks.tooltip") as mock_tooltip,
-        ):
-            mock_fetch.return_value = "<html>dictionary content</html>"
-            mock_parse.return_value = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        mock_fetch_webpage.return_value = "<html>dictionary content</html>"
+        mock_parse_dictionary_content.return_value = {
+            "pinyin": "nǐhǎo",
+            "vietnamese": "xin chào",
+        }
 
-            auto_define(mock_editor)
+        auto_define(mock_editor)
 
-            # Check that fields were filled with fetched data
-            assert mock_editor.note.fields[1] == "nǐhǎo"
-            assert mock_editor.note.fields[2] == "xin chào"
+        # Check that fields were filled with fetched data
+        assert mock_editor.note.fields[1] == "nǐhǎo"
+        assert mock_editor.note.fields[2] == "xin chào"
 
-            # Check that success tooltip was shown
-            mock_tooltip.assert_called_once()
-            assert "Successfully filled" in mock_tooltip.call_args[0][0]
-            assert "你好" in mock_tooltip.call_args[0][0]
+        # Check that success tooltip was shown
+        mock_tooltip.assert_called_once()
+        assert "Successfully filled" in mock_tooltip.call_args[0][0]
+        assert "你好" in mock_tooltip.call_args[0][0]
 
-    def test_shows_error_when_no_chinese_text(self, mock_editor):
+    def test_shows_error_when_no_chinese_text(self, mock_editor, mock_tooltip):
         """Test that auto_define shows error when no Chinese text found."""
         mock_editor.note.fields[0] = ""  # Empty Chinese field
 
-        with patch("autodefine_cn_vn.ui_hooks.tooltip") as mock_tooltip:
-            auto_define(mock_editor)
+        auto_define(mock_editor)
 
-            mock_tooltip.assert_called_once()
-            assert "No Chinese text" in mock_tooltip.call_args[0][0]
+        mock_tooltip.assert_called_once()
+        assert "No Chinese text" in mock_tooltip.call_args[0][0]
 
-    def test_shows_warning_when_no_data_found(self, mock_editor):
+    def test_shows_warning_when_no_data_found(
+        self, mock_editor, mock_fetch_webpage, mock_parse_dictionary_content, mock_tooltip
+    ):
         """Test that auto_define shows warning when no data is found."""
-        with (
-            patch("autodefine_cn_vn.ui_hooks.fetch_webpage") as mock_fetch,
-            patch("autodefine_cn_vn.ui_hooks.parse_dictionary_content") as mock_parse,
-            patch("autodefine_cn_vn.ui_hooks.tooltip") as mock_tooltip,
-        ):
-            mock_fetch.return_value = "<html>empty content</html>"
-            mock_parse.return_value = {"pinyin": "", "vietnamese": ""}
+        mock_fetch_webpage.return_value = "<html>empty content</html>"
+        mock_parse_dictionary_content.return_value = {"pinyin": "", "vietnamese": ""}
 
-            auto_define(mock_editor)
+        auto_define(mock_editor)
 
-            # Check that warning tooltip was shown
-            mock_tooltip.assert_called_once()
-            assert "No data found" in mock_tooltip.call_args[0][0]
-            assert "你好" in mock_tooltip.call_args[0][0]
+        # Check that warning tooltip was shown
+        mock_tooltip.assert_called_once()
+        assert "No data found" in mock_tooltip.call_args[0][0]
+        assert "你好" in mock_tooltip.call_args[0][0]
 
-    def test_handles_http_error(self, mock_editor):
+    def test_handles_http_error(self, mock_editor, mock_fetch_webpage, mock_tooltip):
         """Test that auto_define handles HTTP errors gracefully."""
         import urllib.error
 
-        with (
-            patch("autodefine_cn_vn.ui_hooks.fetch_webpage") as mock_fetch,
-            patch("autodefine_cn_vn.ui_hooks.tooltip") as mock_tooltip,
-        ):
-            mock_fetch.side_effect = urllib.error.HTTPError(
-                url="http://test.com", code=404, msg="Not Found", hdrs={}, fp=None
-            )
+        mock_fetch_webpage.side_effect = urllib.error.HTTPError(
+            url="http://test.com", code=404, msg="Not Found", hdrs={}, fp=None
+        )
 
-            auto_define(mock_editor)
+        auto_define(mock_editor)
 
-            # Check that error tooltip was shown
-            mock_tooltip.assert_called_once()
-            assert "HTTP error 404" in mock_tooltip.call_args[0][0]
-            assert "你好" in mock_tooltip.call_args[0][0]
+        # Check that error tooltip was shown
+        mock_tooltip.assert_called_once()
+        assert "HTTP error 404" in mock_tooltip.call_args[0][0]
+        assert "你好" in mock_tooltip.call_args[0][0]
 
-    def test_handles_url_error(self, mock_editor):
+    def test_handles_url_error(self, mock_editor, mock_fetch_webpage, mock_tooltip):
         """Test that auto_define handles network errors gracefully."""
         import urllib.error
 
-        with (
-            patch("autodefine_cn_vn.ui_hooks.fetch_webpage") as mock_fetch,
-            patch("autodefine_cn_vn.ui_hooks.tooltip") as mock_tooltip,
-        ):
-            mock_fetch.side_effect = urllib.error.URLError("Connection refused")
+        mock_fetch_webpage.side_effect = urllib.error.URLError("Connection refused")
 
-            auto_define(mock_editor)
+        auto_define(mock_editor)
 
-            # Check that error tooltip was shown
-            mock_tooltip.assert_called_once()
-            assert "Network error" in mock_tooltip.call_args[0][0]
-            assert "你好" in mock_tooltip.call_args[0][0]
+        # Check that error tooltip was shown
+        mock_tooltip.assert_called_once()
+        assert "Network error" in mock_tooltip.call_args[0][0]
+        assert "你好" in mock_tooltip.call_args[0][0]
 
-    def test_handles_unexpected_error(self, mock_editor):
+    def test_handles_unexpected_error(self, mock_editor, mock_fetch_webpage, mock_tooltip):
         """Test that auto_define handles unexpected errors gracefully."""
-        with (
-            patch("autodefine_cn_vn.ui_hooks.fetch_webpage") as mock_fetch,
-            patch("autodefine_cn_vn.ui_hooks.tooltip") as mock_tooltip,
-        ):
-            mock_fetch.side_effect = Exception("Unexpected error")
+        mock_fetch_webpage.side_effect = Exception("Unexpected error")
 
-            auto_define(mock_editor)
+        auto_define(mock_editor)
 
-            # Check that error tooltip was shown
-            mock_tooltip.assert_called_once()
-            assert "Unexpected error" in mock_tooltip.call_args[0][0]
-            assert "你好" in mock_tooltip.call_args[0][0]
+        # Check that error tooltip was shown
+        mock_tooltip.assert_called_once()
+        assert "Unexpected error" in mock_tooltip.call_args[0][0]
+        assert "你好" in mock_tooltip.call_args[0][0]
 
-    def test_uses_correct_url_and_timeout(self, mock_editor):
+    def test_uses_correct_url_and_timeout(
+        self, mock_editor, mock_fetch_webpage, mock_parse_dictionary_content, mock_tooltip
+    ):
         """Test that auto_define uses correct URL and timeout from config."""
-        with (
-            patch("autodefine_cn_vn.ui_hooks.fetch_webpage") as mock_fetch,
-            patch("autodefine_cn_vn.ui_hooks.parse_dictionary_content") as mock_parse,
-            patch("autodefine_cn_vn.ui_hooks.tooltip"),
-        ):
-            mock_fetch.return_value = "<html>content</html>"
-            mock_parse.return_value = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        mock_fetch_webpage.return_value = "<html>content</html>"
+        mock_parse_dictionary_content.return_value = {
+            "pinyin": "nǐhǎo",
+            "vietnamese": "xin chào",
+        }
 
-            auto_define(mock_editor)
+        auto_define(mock_editor)
 
-            # Verify fetch_webpage was called with correct arguments
-            expected_url = "http://2.vndic.net/index.php?word=你好&dict=cn_vi"
-            mock_fetch.assert_called_once_with(expected_url, 10)
+        # Verify fetch_webpage was called with correct arguments
+        expected_url = "http://2.vndic.net/index.php?word=你好&dict=cn_vi"
+        mock_fetch_webpage.assert_called_once_with(expected_url, 10)
 
 
 class TestSetupEditorButtons:
