@@ -297,7 +297,7 @@ def update_manifest_version(manifest_path: Path, new_version: Version) -> None:
     if not manifest_path.exists():
         return
 
-    with open(manifest_path, "r") as f:
+    with open(manifest_path) as f:
         manifest_data = json.load(f)
 
     # Extract base name without version
