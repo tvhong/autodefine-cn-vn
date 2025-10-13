@@ -13,7 +13,7 @@
 - [x] Make ui_hooks a class?
 - [x] Create field utility functions (get_field, set_field) with tests
 
-## 0.2.0: Pull definition from remote website
+### 0.1.2: Pull definition from remote website
 
 - [x] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
 - [x] Parse pinyin, and Vietnamese definition from it
@@ -22,30 +22,30 @@
 - [x] Fill out fields with pinyin and Vietnamese definition
 - [x] Download the data and parse
 
-### 0.2.1: Clean up
+### 0.1.3: Clean up
 
 - [ ] Update claude.md
 - [ ] Make ConfigManager a singleton
 - [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again
 
-### 0.2.2: Support audio
+## 0.2.0: Support audio
 
 - [ ] Download the audio into appropriate places
   - Example: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [ ] Link it to the card
 
-### 0.2.x: Clean up
+### 0.1.x: Clean up
 
 - [ ] Use a typed class for config
 - [ ] Remove retry config
 
-### 0.2.3: Support sample sentences
+### 0.1.x: Support sample sentences
 
 - [ ] Add configuration field
 - [ ] Parse sample sentences
 - [ ] Add multiple sentences to the fields, highlighting the chinese word
 
-### 0.2.4: Support multiple definitions
+### 0.1.x: Support multiple definitions
 
 - [ ] Parse all definitions
 - [ ] Pass all of them into the field
