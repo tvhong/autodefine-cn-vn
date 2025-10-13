@@ -21,10 +21,11 @@
 - [x] Package bs4 into the release somehow
 - [x] Fill out fields with pinyin and Vietnamese definition
 - [x] Download the data and parse
+- [x] Update claude.md
+- [ ] Test that it actually works
 
 ### 0.1.3: Clean up
 
-- [ ] Update claude.md
 - [ ] Make ConfigManager a singleton
 - [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again
 
