@@ -19,20 +19,31 @@
 - [x] Parse pinyin, and Vietnamese definition from it
 - [x] Add additioonal test data: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [x] Package bs4 into the release somehow
-- [ ] Fill out fields with pinyin and Vietnamese definition
+- [x] Fill out fields with pinyin and Vietnamese definition
 - [ ] Download the data and parse
 
 ### 0.2.1: Clean up
 
-- [ ] Make ConfigManager a singleton
-- [ ] Create a hook so that when the config is edited, run ConfigManager.load_config again
 - [ ] Update claude.md
+- [ ] Make ConfigManager a singleton
+- [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again
 
-## 0.3.0: Support audio
+### 0.2.2: Support audio
 
-- [ ] Download the audio into appropriate place
+- [ ] Download the audio into appropriate places
   - Example: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [ ] Link it to the card
+
+### 0.2.3: Support sample sentences
+
+- [ ] Add configuration field
+- [ ] Parse sample sentences
+- [ ] Add multiple sentences to the fields, highlighting the chinese word
+
+### 0.2.4: Support multiple definitions
+
+- [ ] Parse all definitions
+- [ ] Pass all of them into the field
 
 ## 0.x: Nice to have features
 
