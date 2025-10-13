@@ -20,7 +20,7 @@
 - [x] Add additioonal test data: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [x] Package bs4 into the release somehow
 - [x] Fill out fields with pinyin and Vietnamese definition
-- [ ] Download the data and parse
+- [x] Download the data and parse
 
 ### 0.2.1: Clean up
 
@@ -33,6 +33,11 @@
 - [ ] Download the audio into appropriate places
   - Example: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [ ] Link it to the card
+
+### 0.2.x: Clean up
+
+- [ ] Use a typed class for config
+- [ ] Remove retry config
 
 ### 0.2.3: Support sample sentences
 
