@@ -5,7 +5,7 @@ from aqt import mw
 from aqt.utils import tooltip
 
 
-def show_tooltip_and_print(message: str, period: int = 3000) -> None:
+def notify(message: str, period: int = 3000) -> None:
     """Show a tooltip in Anki UI and print the same message to stdout.
 
     Args:
