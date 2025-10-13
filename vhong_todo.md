@@ -1,32 +1,5 @@
 # Anki Auto-Define Chinese-Vietnamese Addon - Todo List
 
-## 0.1.0: Project Setup & Core Structure
-
-- [x] **Task 1**: Setup project structure and manifest - Create addon structure with manifest.json, **init**.py
-- [x] **Task 2**: Setup lint and test using uv
-- [x] **Task 3**: Implement basic configuration system - Create config.json, config_manager.py for user settings
-- [x] **Task 4**: Setup Anki UI hooks - Implement ui_hooks.py to integrate with Anki's card editor to add a button that will trigger auto filling of the configured fields with some stub values.
-
-### 0.1.1: Clean up
-
-- [x] Check tests for ui_hooks
-- [x] Make ui_hooks a class?
-- [x] Create field utility functions (get_field, set_field) with tests
-
-### 0.1.2: Pull definition from remote website (MVP)
-
-- [x] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
-- [x] Parse pinyin, and Vietnamese definition from it
-- [x] Add additioonal test data: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
-- [x] Package bs4 into the release somehow
-- [x] Fill out fields with pinyin and Vietnamese definition
-- [x] Download the data and parse
-- [x] Update claude.md
-- [x] Test that it actually works
-  - [x] Fixing url encoding stuff
-- [x] Make updating release easier for manual testing
-- [x] Add on name should include version for ease of tracking
-
 ## 0.2.0: Support audio and sample sentences
 
 - [ ] Download the audio into appropriate places
@@ -35,6 +8,7 @@
 
 ### 0.2.1: Clean up
 
+- [ ] Fix shortcut
 - [ ] Use a typed class for config
 - [ ] Remove retry config
 - [ ] Make ConfigManager a singleton
