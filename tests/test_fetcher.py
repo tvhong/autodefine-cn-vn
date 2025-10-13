@@ -251,7 +251,6 @@ class TestParseDictionaryContent:
 
         result = parse_dictionary_content(html_content)
 
-        breakpoint()
         assert result["pinyin"] == "nǐ"
         assert "anh" in result["vietnamese"]
         assert "chị" in result["vietnamese"]

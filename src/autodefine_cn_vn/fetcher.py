@@ -69,22 +69,17 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
         if pinyin.startswith("[") and pinyin.endswith("]"):
             pinyin = pinyin[1:-1]
 
-    # Extract Vietnamese definition from the table containing TD elements with class="tacon"
+    # Extract Vietnamese definition by finding the TD after the one with the marker image
     vietnamese = ""
-    # Find all tables and look for the one with class="tacon" cells
-    for table in soup.find_all("table"):
-        # Only get direct child TR elements to avoid nested tables
-        rows = table.find_all("tr", recursive=False)
-        if len(rows) >= 2:
-            # Look for the first row with 3 TDs (definition row)
-            # Rows with 2 TDs typically contain metadata like pinyin, radicals, etc.
-            for row in rows[1:]:  # Skip first row (usually contains pinyin)
-                tds = row.find_all("td", class_="tacon", recursive=False)
-                if len(tds) >= 3:
-                    # Get the last TD which contains the Vietnamese definition
-                    vietnamese = tds[-1].get_text(strip=True)
-                    break
-            if vietnamese:
-                break
+    # Find the img tag with the specific marker image
+    marker_img = soup.find("img", src=lambda x: x and "img/dict/CB1FF077.png" in x)
+    if marker_img:
+        # Find the parent TD of the marker image
+        marker_td = marker_img.find_parent("td")
+        if marker_td:
+            # Get the next sibling TD which contains the Vietnamese definition
+            next_td = marker_td.find_next_sibling("td")
+            if next_td:
+                vietnamese = next_td.get_text(strip=True)
 
     return {"pinyin": pinyin, "vietnamese": vietnamese}
