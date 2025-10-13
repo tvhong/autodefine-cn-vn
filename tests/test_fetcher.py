@@ -215,20 +215,10 @@ class TestParseDictionaryContent:
     def test_parse_real_dictionary_page(self):
         """Test parsing a real dictionary page HTML (公斤 = kilogram)."""
         # This is the actual HTML structure from vndic.net for the word 公斤
-        html_content = """
-        <table border="0" width="100%" cellspacing="1" cellpadding="1" style="border-collapse: collapse">
-            <tr>
-                <td valign="top">  <span class="thisword" itemscope itemtype="http://schema.org/Article">
-                <font color="#F93E3B" itemprop="name">公斤</font></span><br><itemprop itemprop="articleBody">
-                <di class="cdo-dblclick-area" itemprop="description"><span class=korean><br /><br />
-                <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
-                <TD class="tacon" colspan=2><FONT COLOR=#7F0000>[gōngjīn]</FONT></TD></TR>
-                <TR><TD class="tacon"> </TD><TD class="tacon"><IMG src=img/dict/CB1FF077.png></TD>
-                <TD class="tacon">ki-lô-gam。国际公制重量或质量主单位，一公斤等于一千克，合二市斤。</TD></TR></TABLE>
-                <br /><br /></span></di> </itemprop></td>
-            </tr>
-        </table>
-        """
+        from pathlib import Path
+
+        asset_path = Path(__file__).parent / "assets" / "dict_page_gongjin.html"
+        html_content = asset_path.read_text(encoding="utf-8")
 
         result = parse_dictionary_content(html_content)
 
