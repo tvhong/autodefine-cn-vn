@@ -9,7 +9,6 @@ import argparse
 import shutil
 import subprocess
 import sys
-import tempfile
 import tomllib
 import zipfile
 from pathlib import Path
@@ -65,20 +64,24 @@ def build(output_dir: Path | None = None) -> Path:
     print("=" * 50)
     print()
 
-    # Create temporary build directory
-    with tempfile.TemporaryDirectory() as temp_dir:
-        build_dir = Path(temp_dir) / "autodefine_cn_vn"
-        build_dir.mkdir()
+    # Create build directory
+    build_root = project_root / "build"
+    build_dir = build_root / "autodefine_cn_vn"
 
-        # Step 1: Copy addon files
-        copy_addon_files(src_dir, build_dir)
+    # Clean and recreate build directory
+    if build_root.exists():
+        shutil.rmtree(build_root)
+    build_dir.mkdir(parents=True)
 
-        # Step 2: Install vendor dependencies
-        vendor_dir = build_dir / "vendor"
-        install_vendor_dependencies(vendor_dir, project_root)
+    # Step 1: Copy addon files
+    copy_addon_files(src_dir, build_dir)
 
-        # Step 3: Create .ankiaddon package
-        create_ankiaddon_package(build_dir, output_file)
+    # Step 2: Install vendor dependencies
+    vendor_dir = build_dir / "vendor"
+    install_vendor_dependencies(vendor_dir, project_root)
+
+    # Step 3: Create .ankiaddon package
+    create_ankiaddon_package(build_dir, output_file)
 
     print()
     print("✅ Build complete! 🎉")
