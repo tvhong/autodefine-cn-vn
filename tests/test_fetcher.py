@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from autodefine_cn_vn.fetcher import fetch_webpage, format_url
+from autodefine_cn_vn.fetcher import fetch_webpage, format_url, parse_dictionary_content
 
 
 class TestFormatUrl:
@@ -130,3 +130,108 @@ class TestFetchWebpage:
         # Verify timeout was passed to urlopen
         call_args = mock_urlopen.call_args
         assert call_args[1]["timeout"] == timeout
+
+
+class TestParseDictionaryContent:
+    """Test suite for parsing dictionary content."""
+
+    def test_parse_valid_dictionary_content(self):
+        """Test parsing valid dictionary HTML with pinyin and Vietnamese definition."""
+        html_content = """
+        <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
+        <TD class="tacon" colspan=2><FONT COLOR=#7F0000>[gōngjīn]</FONT></TD></TR>
+        <TR><TD class="tacon"> </TD><TD class="tacon"><IMG src=img/dict/CB1FF077.png></TD>
+        <TD class="tacon">ki-lô-gam。国际公制重量或质量主单位，一公斤等于一千克，合二市斤。</TD></TR></TABLE>
+        """
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == "[gōngjīn]"
+        assert (
+            result["vietnamese"]
+            == "ki-lô-gam。国际公制重量或质量主单位，一公斤等于一千克，合二市斤。"
+        )
+
+    def test_parse_content_with_extra_whitespace(self):
+        """Test parsing content with extra whitespace."""
+        html_content = """
+        <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
+        <TD class="tacon" colspan=2><FONT COLOR=#7F0000>  [nǐhǎo]  </FONT></TD></TR>
+        <TR><TD class="tacon"> </TD><TD class="tacon"><IMG src=img/dict/CB1FF077.png></TD>
+        <TD class="tacon">  xin chào  </TD></TR></TABLE>
+        """
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == "[nǐhǎo]"
+        assert result["vietnamese"] == "xin chào"
+
+    def test_parse_content_missing_pinyin(self):
+        """Test parsing content when pinyin is missing."""
+        html_content = """
+        <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
+        <TD class="tacon" colspan=2></TD></TR>
+        <TR><TD class="tacon"> </TD><TD class="tacon"><IMG src=img/dict/CB1FF077.png></TD>
+        <TD class="tacon">xin chào</TD></TR></TABLE>
+        """
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == ""
+        assert result["vietnamese"] == "xin chào"
+
+    def test_parse_content_missing_vietnamese(self):
+        """Test parsing content when Vietnamese definition is missing."""
+        html_content = """
+        <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
+        <TD class="tacon" colspan=2><FONT COLOR=#7F0000>[nǐhǎo]</FONT></TD></TR>
+        <TR><TD class="tacon"> </TD><TD class="tacon"><IMG src=img/dict/CB1FF077.png></TD>
+        <TD class="tacon"></TD></TR></TABLE>
+        """
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == "[nǐhǎo]"
+        assert result["vietnamese"] == ""
+
+    def test_parse_content_missing_table(self):
+        """Test parsing content when TABLE element is missing."""
+        html_content = "<html><body>No table here</body></html>"
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == ""
+        assert result["vietnamese"] == ""
+
+    def test_parse_empty_html(self):
+        """Test parsing empty HTML."""
+        html_content = ""
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == ""
+        assert result["vietnamese"] == ""
+
+    def test_parse_real_dictionary_page(self):
+        """Test parsing a real dictionary page HTML (公斤 = kilogram)."""
+        # This is the actual HTML structure from vndic.net for the word 公斤
+        html_content = """
+        <table border="0" width="100%" cellspacing="1" cellpadding="1" style="border-collapse: collapse">
+            <tr>
+                <td valign="top">  <span class="thisword" itemscope itemtype="http://schema.org/Article">
+                <font color="#F93E3B" itemprop="name">公斤</font></span><br><itemprop itemprop="articleBody">
+                <di class="cdo-dblclick-area" itemprop="description"><span class=korean><br /><br />
+                <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
+                <TD class="tacon" colspan=2><FONT COLOR=#7F0000>[gōngjīn]</FONT></TD></TR>
+                <TR><TD class="tacon"> </TD><TD class="tacon"><IMG src=img/dict/CB1FF077.png></TD>
+                <TD class="tacon">ki-lô-gam。国际公制重量或质量主单位，一公斤等于一千克，合二市斤。</TD></TR></TABLE>
+                <br /><br /></span></di> </itemprop></td>
+            </tr>
+        </table>
+        """
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == "[gōngjīn]"
+        assert "ki-lô-gam" in result["vietnamese"]
+        assert "国际公制重量或质量主单位" in result["vietnamese"]

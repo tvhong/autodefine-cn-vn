@@ -3,6 +3,8 @@
 import urllib.error
 import urllib.request
 
+from bs4 import BeautifulSoup
+
 
 def format_url(url_template: str, chinese_word: str) -> str:
     """Format URL by replacing placeholder with Chinese word.
@@ -38,3 +40,45 @@ def fetch_webpage(url: str, timeout: int) -> str:
     with urllib.request.urlopen(url, timeout=timeout) as response:
         content_bytes = response.read()
         return content_bytes.decode("utf-8")
+
+
+def parse_dictionary_content(html_content: str) -> dict[str, str]:
+    """Parse pinyin and Vietnamese definition from dictionary HTML content.
+
+    Args:
+        html_content: The HTML content to parse
+
+    Returns:
+        Dictionary with 'pinyin' and 'vietnamese' keys.
+        Returns empty strings for missing data.
+
+    Examples:
+        >>> html = '<FONT COLOR=#7F0000>[gōngjīn]</FONT>'
+        >>> result = parse_dictionary_content(html)
+        >>> result['pinyin']
+        '[gōngjīn]'
+    """
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Extract pinyin from <FONT COLOR=#7F0000> tag
+    pinyin = ""
+    font_tag = soup.find("font", {"color": "#7F0000"})
+    if font_tag:
+        pinyin = font_tag.get_text(strip=True)
+
+    # Extract Vietnamese definition from the table containing TD elements with class="tacon"
+    vietnamese = ""
+    # Find all tables and look for the one with class="tacon" cells
+    for table in soup.find_all("table"):
+        # Only get direct child TR elements to avoid nested tables
+        rows = table.find_all("tr", recursive=False)
+        if len(rows) >= 2:
+            # Check if this table has TD elements with class="tacon"
+            second_row = rows[1]
+            tds = second_row.find_all("td", class_="tacon", recursive=False)
+            if tds:
+                # Get the last TD which contains the Vietnamese definition
+                vietnamese = tds[-1].get_text(strip=True)
+                break
+
+    return {"pinyin": pinyin, "vietnamese": vietnamese}

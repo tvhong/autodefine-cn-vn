@@ -16,8 +16,10 @@
 ## 0.2.0: Pull definition from remote website
 
 - [x] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
-- [ ] Parse pinyin, audio, and Vietnamese definition from it
+- [x] Parse pinyin, and Vietnamese definition from it
+- [ ] Add additioonal test data: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [ ] Fill out fields with pinyin and Vietnamese definition
+- [ ] Package bs4 into the release somehow
 
 ### 0.2.1: Clean up
 
