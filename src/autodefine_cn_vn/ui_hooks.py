@@ -1,5 +1,6 @@
 """UI hooks for integrating with Anki's card editor."""
 
+import urllib.error
 from typing import TYPE_CHECKING
 
 from anki.hooks import addHook
@@ -7,6 +8,7 @@ from anki.notes import Note
 from aqt.utils import tooltip
 
 from autodefine_cn_vn.config_manager import ConfigManager
+from autodefine_cn_vn.fetcher import fetch_webpage, format_url, parse_dictionary_content
 from autodefine_cn_vn.utils import get_field, set_field
 
 if TYPE_CHECKING:
@@ -35,7 +37,7 @@ def setup_editor_buttons(buttons: list[str], editor: "Editor") -> list[str]:
     button = editor.addButton(
         icon=None,
         cmd="autodefine_cn_vn",
-        func=lambda ed: ed.saveNow(lambda: auto_define_with_stub(ed)),
+        func=lambda ed: ed.saveNow(lambda: auto_define(ed)),
         tip=f"AutoDefine Chinese-Vietnamese ({shortcut if shortcut else 'no shortcut'})",
         label="自動",  # "Auto" in Chinese
         keys=shortcut if shortcut else "",
@@ -45,11 +47,11 @@ def setup_editor_buttons(buttons: list[str], editor: "Editor") -> list[str]:
     return buttons
 
 
-def auto_define_with_stub(editor: "Editor") -> None:
-    """Auto-fill fields with stub data for testing.
+def auto_define(editor: "Editor") -> None:
+    """Auto-fill fields with fetched pinyin and Vietnamese definition.
 
-    This is a temporary implementation that fills fields with placeholder data
-    to test the UI integration.
+    Fetches the Chinese-Vietnamese dictionary page for the Chinese text
+    and populates the card fields with pinyin and Vietnamese definition.
 
     Args:
         editor: Anki editor instance
@@ -63,30 +65,60 @@ def auto_define_with_stub(editor: "Editor") -> None:
 
     config_manager = ConfigManager()
     field_mapping = config_manager.get_field_mapping()
+    api_settings = config_manager.get_api_settings()
 
-    # Fill fields with stub data
-    insert_into_field(
-        editor,
-        f"[Stub Pinyin for: {chinese_text}]",
-        field_mapping["pinyin_field"],
-        overwrite=True,
-    )
+    # Format URL and fetch webpage
+    url_template = str(api_settings["source"])
+    timeout = int(api_settings["timeout_seconds"])
+    url = format_url(url_template, chinese_text)
 
-    insert_into_field(
-        editor,
-        f"[Stub Vietnamese translation for: {chinese_text}]",
-        field_mapping["vietnamese_field"],
-        overwrite=True,
-    )
+    try:
+        html_content = fetch_webpage(url, timeout)
+        parsed_data = parse_dictionary_content(html_content)
 
-    insert_into_field(
-        editor,
-        "[Stub Audio]",
-        field_mapping["audio_field"],
-        overwrite=True,
-    )
+        # Fill pinyin field
+        pinyin = parsed_data.get("pinyin", "")
+        if pinyin:
+            insert_into_field(
+                editor,
+                pinyin,
+                field_mapping["pinyin_field"],
+                overwrite=True,
+            )
 
-    tooltip(f"AutoDefine: Filled fields with stub data for '{chinese_text}'")
+        # Fill Vietnamese field
+        vietnamese = parsed_data.get("vietnamese", "")
+        if vietnamese:
+            insert_into_field(
+                editor,
+                vietnamese,
+                field_mapping["vietnamese_field"],
+                overwrite=True,
+            )
+
+        if pinyin or vietnamese:
+            tooltip(f"AutoDefine: Successfully filled fields for '{chinese_text}'")
+        else:
+            tooltip(
+                f"AutoDefine: No data found for '{chinese_text}'. "
+                f"The word may not exist in the dictionary."
+            )
+
+    except urllib.error.HTTPError as e:
+        tooltip(
+            f"AutoDefine: HTTP error {e.code} while fetching data for '{chinese_text}'",
+            period=5000,
+        )
+    except urllib.error.URLError as e:
+        tooltip(
+            f"AutoDefine: Network error while fetching data for '{chinese_text}': {e.reason}",
+            period=5000,
+        )
+    except Exception as e:
+        tooltip(
+            f"AutoDefine: Unexpected error while processing '{chinese_text}': {str(e)}",
+            period=5000,
+        )
 
 
 def get_chinese_text(editor: "Editor") -> str:
