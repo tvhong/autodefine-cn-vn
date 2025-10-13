@@ -23,9 +23,12 @@
 - [x] Download the data and parse
 - [x] Update claude.md
 - [ ] Test that it actually works
+  - [ ] Fixing url encoding stuff
 
 ### 0.1.3: Clean up
 
+- [ ] Make updating release easier for manual testing
+- [ ] Add on name should include version for ease of tracking
 - [ ] Make ConfigManager a singleton
 - [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again
 

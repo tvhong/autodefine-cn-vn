@@ -258,7 +258,7 @@ class TestAutoDefine:
         auto_define(mock_editor)
 
         # Verify fetch_webpage was called with correct arguments
-        expected_url = "http://2.vndic.net/index.php?word=你好&dict=cn_vi"
+        expected_url = "http://2.vndic.net/index.php?word=%E4%BD%A0%E5%A5%BD&dict=cn_vi"
         mock_fetch_webpage.assert_called_once_with(expected_url, 10)
 
 

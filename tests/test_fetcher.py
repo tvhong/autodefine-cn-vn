@@ -17,7 +17,7 @@ class TestFormatUrl:
 
         result = format_url(url_template, chinese_word)
 
-        assert result == "http://2.vndic.net/index.php?word=你好&dict=cn_vi"
+        assert result == "http://2.vndic.net/index.php?word=%E4%BD%A0%E5%A5%BD&dict=cn_vi"
 
     def test_format_url_with_complex_chinese_phrase(self):
         """Test URL formatting with a complex Chinese phrase."""
@@ -26,7 +26,10 @@ class TestFormatUrl:
 
         result = format_url(url_template, chinese_word)
 
-        assert result == "http://2.vndic.net/index.php?word=我爱学习中文&dict=cn_vi"
+        assert (
+            result
+            == "http://2.vndic.net/index.php?word=%E6%88%91%E7%88%B1%E5%AD%A6%E4%B9%A0%E4%B8%AD%E6%96%87&dict=cn_vi"
+        )
 
     def test_format_url_with_empty_string(self):
         """Test URL formatting with an empty string."""
@@ -44,7 +47,7 @@ class TestFormatUrl:
 
         result = format_url(url_template, chinese_word)
 
-        assert result == "http://2.vndic.net/index.php?word=你好！&dict=cn_vi"
+        assert result == "http://2.vndic.net/index.php?word=%E4%BD%A0%E5%A5%BD%EF%BC%81&dict=cn_vi"
 
 
 class TestFetchWebpage:

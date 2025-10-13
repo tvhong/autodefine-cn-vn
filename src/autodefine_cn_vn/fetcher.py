@@ -1,26 +1,28 @@
 """Functions for fetching and parsing Chinese-Vietnamese dictionary content."""
 
 import urllib.error
+import urllib.parse
 import urllib.request
 
 from bs4 import BeautifulSoup
 
 
 def format_url(url_template: str, chinese_word: str) -> str:
-    """Format URL by replacing placeholder with Chinese word.
+    """Format URL by replacing placeholder with URL-encoded Chinese word.
 
     Args:
         url_template: URL template string with {} placeholder
         chinese_word: Chinese word to insert into URL
 
     Returns:
-        Formatted URL with Chinese word inserted
+        Formatted URL with URL-encoded Chinese word inserted
 
     Examples:
         >>> format_url("http://example.com?word={}", "你好")
-        'http://example.com?word=你好'
+        'http://example.com?word=%E4%BD%A0%E5%A5%BD'
     """
-    return url_template.format(chinese_word)
+    encoded_word = urllib.parse.quote(chinese_word)
+    return url_template.format(encoded_word)
 
 
 def fetch_webpage(url: str, timeout: int) -> str:
