@@ -15,99 +15,20 @@ import zipfile
 from pathlib import Path
 
 
-def get_version(pyproject_path: Path) -> str:
-    """Get version from pyproject.toml."""
-    with open(pyproject_path, "rb") as f:
-        data = tomllib.load(f)
-    return data["project"]["version"]
+def main() -> int:
+    """Main entry point."""
+    parser = argparse.ArgumentParser(description="Build autodefine-cn-vn Anki addon")
+    parser.add_argument("--clean", action="store_true", help="Clean existing build artifacts")
+    parser.add_argument("--output-dir", type=Path, help="Output directory (default: dist/)")
 
+    args = parser.parse_args()
 
-def install_vendor_dependencies(vendor_dir: Path) -> None:
-    """Install bs4 and dependencies into vendor directory.
-
-    Args:
-        vendor_dir: Path to vendor directory where packages will be installed
-    """
-    print(f"📦 Installing vendor dependencies to {vendor_dir}...")
-
-    # Ensure vendor directory exists
-    vendor_dir.mkdir(parents=True, exist_ok=True)
-
-    # Install beautifulsoup4 and its dependencies
-    # We use pip install with --target to install into the vendor directory
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "--target",
-            str(vendor_dir),
-            "--no-deps",  # We'll install deps explicitly
-            "beautifulsoup4>=4.12.0",
-        ],
-        check=True,
-    )
-
-    # Install bs4 dependencies
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "--target",
-            str(vendor_dir),
-            "soupsieve",
-            "typing-extensions",
-        ],
-        check=True,
-    )
-
-    # Clean up unnecessary files
-    for pattern in ["*.dist-info", "*.egg-info", "__pycache__"]:
-        for path in vendor_dir.rglob(pattern):
-            if path.is_dir():
-                shutil.rmtree(path)
-            else:
-                path.unlink()
-
-    print("✓ Vendor dependencies installed")
-
-
-def copy_addon_files(src_dir: Path, dest_dir: Path) -> None:
-    """Copy addon source files to destination.
-
-    Args:
-        src_dir: Source directory (src/autodefine_cn_vn)
-        dest_dir: Destination directory for build
-    """
-    print(f"📋 Copying addon files from {src_dir} to {dest_dir}...")
-
-    # Copy all Python files and JSON configs
-    for pattern in ["*.py", "*.json"]:
-        for file in src_dir.glob(pattern):
-            shutil.copy2(file, dest_dir / file.name)
-
-    print("✓ Addon files copied")
-
-
-def create_ankiaddon_package(build_dir: Path, output_file: Path) -> None:
-    """Create .ankiaddon package (zip file) from build directory.
-
-    Args:
-        build_dir: Directory containing addon files to package
-        output_file: Output .ankiaddon file path
-    """
-    print(f"📦 Creating .ankiaddon package: {output_file}...")
-
-    with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for file in build_dir.rglob("*"):
-            if file.is_file():
-                arcname = file.relative_to(build_dir.parent)
-                zipf.write(file, arcname)
-
-    print(f"✓ Package created: {output_file}")
+    try:
+        build(clean=args.clean, output_dir=args.output_dir)
+        return 0
+    except Exception as e:
+        print(f"❌ Build failed: {e}", file=sys.stderr)
+        return 1
 
 
 def build(clean: bool = False, output_dir: Path | None = None) -> Path:
@@ -170,20 +91,99 @@ def build(clean: bool = False, output_dir: Path | None = None) -> Path:
     return output_file
 
 
-def main() -> int:
-    """Main entry point."""
-    parser = argparse.ArgumentParser(description="Build autodefine-cn-vn Anki addon")
-    parser.add_argument("--clean", action="store_true", help="Clean existing build artifacts")
-    parser.add_argument("--output-dir", type=Path, help="Output directory (default: dist/)")
+def copy_addon_files(src_dir: Path, dest_dir: Path) -> None:
+    """Copy addon source files to destination.
 
-    args = parser.parse_args()
+    Args:
+        src_dir: Source directory (src/autodefine_cn_vn)
+        dest_dir: Destination directory for build
+    """
+    print(f"📋 Copying addon files from {src_dir} to {dest_dir}...")
 
-    try:
-        build(clean=args.clean, output_dir=args.output_dir)
-        return 0
-    except Exception as e:
-        print(f"❌ Build failed: {e}", file=sys.stderr)
-        return 1
+    # Copy all Python files and JSON configs
+    for pattern in ["*.py", "*.json"]:
+        for file in src_dir.glob(pattern):
+            shutil.copy2(file, dest_dir / file.name)
+
+    print("✓ Addon files copied")
+
+
+def install_vendor_dependencies(vendor_dir: Path) -> None:
+    """Install bs4 and dependencies into vendor directory.
+
+    Args:
+        vendor_dir: Path to vendor directory where packages will be installed
+    """
+    print(f"📦 Installing vendor dependencies to {vendor_dir}...")
+
+    # Ensure vendor directory exists
+    vendor_dir.mkdir(parents=True, exist_ok=True)
+
+    # Install beautifulsoup4 and its dependencies
+    # We use pip install with --target to install into the vendor directory
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--target",
+            str(vendor_dir),
+            "--no-deps",  # We'll install deps explicitly
+            "beautifulsoup4>=4.12.0",
+        ],
+        check=True,
+    )
+
+    # Install bs4 dependencies
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--target",
+            str(vendor_dir),
+            "soupsieve",
+            "typing-extensions",
+        ],
+        check=True,
+    )
+
+    # Clean up unnecessary files
+    for pattern in ["*.dist-info", "*.egg-info", "__pycache__"]:
+        for path in vendor_dir.rglob(pattern):
+            if path.is_dir():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+
+    print("✓ Vendor dependencies installed")
+
+
+def create_ankiaddon_package(build_dir: Path, output_file: Path) -> None:
+    """Create .ankiaddon package (zip file) from build directory.
+
+    Args:
+        build_dir: Directory containing addon files to package
+        output_file: Output .ankiaddon file path
+    """
+    print(f"📦 Creating .ankiaddon package: {output_file}...")
+
+    with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for file in build_dir.rglob("*"):
+            if file.is_file():
+                arcname = file.relative_to(build_dir.parent)
+                zipf.write(file, arcname)
+
+    print(f"✓ Package created: {output_file}")
+
+
+def get_version(pyproject_path: Path) -> str:
+    """Get version from pyproject.toml."""
+    with open(pyproject_path, "rb") as f:
+        data = tomllib.load(f)
+    return data["project"]["version"]
 
 
 if __name__ == "__main__":
