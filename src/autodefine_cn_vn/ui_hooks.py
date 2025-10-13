@@ -5,11 +5,10 @@ from typing import TYPE_CHECKING
 
 from anki.hooks import addHook
 from anki.notes import Note
-from aqt.utils import tooltip
 
 from autodefine_cn_vn.config_manager import ConfigManager
 from autodefine_cn_vn.fetcher import fetch_webpage, format_url, parse_dictionary_content
-from autodefine_cn_vn.utils import get_field, set_field
+from autodefine_cn_vn.utils import get_field, notify, set_field
 
 if TYPE_CHECKING:
     from aqt.editor import Editor
@@ -60,7 +59,7 @@ def auto_define(editor: "Editor") -> None:
     chinese_text = get_chinese_text(editor)
 
     if not chinese_text:
-        tooltip("AutoDefine: No Chinese text found in source field.")
+        notify("AutoDefine: No Chinese text found in source field.")
         return
 
     config_manager = ConfigManager()
@@ -97,25 +96,25 @@ def auto_define(editor: "Editor") -> None:
             )
 
         if pinyin or vietnamese:
-            tooltip(f"AutoDefine: Successfully filled fields for '{chinese_text}'")
+            notify(f"AutoDefine: Successfully filled fields for '{chinese_text}'")
         else:
-            tooltip(
+            notify(
                 f"AutoDefine: No data found for '{chinese_text}'. "
                 f"The word may not exist in the dictionary."
             )
 
     except urllib.error.HTTPError as e:
-        tooltip(
+        notify(
             f"AutoDefine: HTTP error {e.code} while fetching data for '{chinese_text}'",
             period=5000,
         )
     except urllib.error.URLError as e:
-        tooltip(
+        notify(
             f"AutoDefine: Network error while fetching data for '{chinese_text}': {e.reason}",
             period=5000,
         )
     except Exception as e:
-        tooltip(
+        notify(
             f"AutoDefine: Unexpected error while processing '{chinese_text}': {str(e)}",
             period=5000,
         )
@@ -167,7 +166,7 @@ def insert_into_field(
             current_value = get_field(note, field_name)
             set_field(note, field_name, current_value + text)
     except KeyError:
-        tooltip(
+        notify(
             f"AutoDefine: Field '{field_name}' not found in note type. "
             f"Please check your configuration.",
             period=5000,
