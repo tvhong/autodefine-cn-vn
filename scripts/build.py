@@ -164,7 +164,7 @@ def create_ankiaddon_package(build_dir: Path, output_file: Path) -> None:
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zipf:
         for file in build_dir.rglob("*"):
             if file.is_file():
-                arcname = file.relative_to(build_dir.parent)
+                arcname = file.relative_to(build_dir)
                 zipf.write(file, arcname)
 
     print(f"✓ Package created: {output_file}")
