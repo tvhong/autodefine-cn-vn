@@ -6,9 +6,6 @@ dist/
 wheels/
 *.egg-info
 
-# Vendored dependencies (bundled into .ankiaddon during build)
-src/autodefine_cn_vn/vendor/
-
 # Virtual environments
 .venv
 
