@@ -168,6 +168,14 @@ def release(
             print("⚠️  Warning: Working directory is not clean (ignored in dry-run mode)")
             print()
 
+    # Ask for confirmation
+    if not dry_run:
+        response = input("Proceed with release? (y/N): ").strip().lower()
+        if response not in ["y", "yes"]:
+            print("❌ Release cancelled")
+            return False
+        print()
+
     if dry_run:
         print("🔍 Dry run mode - no changes will be made")
         print()
