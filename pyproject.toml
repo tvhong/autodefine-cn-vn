@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "autodefine-cn-vn"
-version = "0.1.3"
+version = "0.1.4"
 description = "Automatically define Anki cards with Vietnamese definitions for Chinese vocabulary."
 readme = "README.md"
 requires-python = ">=3.12"
