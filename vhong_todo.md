@@ -33,20 +33,20 @@
   - Example: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [ ] Link it to the card
 
-### 0.1.x: Clean up
+### 0.2.1: Clean up
 
 - [ ] Use a typed class for config
 - [ ] Remove retry config
 - [ ] Make ConfigManager a singleton
 - [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again
 
-### 0.1.x: Support sample sentences
+### 0.2.x: Support sample sentences
 
 - [ ] Add configuration field
 - [ ] Parse sample sentences
 - [ ] Add multiple sentences to the fields, highlighting the chinese word
 
-### 0.1.x: Support multiple definitions
+### 0.2.x: Support multiple definitions
 
 - [ ] Parse all definitions
 - [ ] Pass all of them into the field
@@ -55,5 +55,5 @@
 
 - [ ] Have a nice icon
 - [ ] Support default tags such as "language::chinese" as well
-- [ ] Make this more generic for different type of translators
+- [ ] Make this more generic for different types of translators
 - [ ] Support multiple card types

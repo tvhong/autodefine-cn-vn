@@ -9,36 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Dictionary Fetcher**: Implemented web scraping functionality to fetch translations from vndic.net
-  - HTTP client to download dictionary pages
-  - Support for Chinese word lookup with automatic URL encoding
-- **Content Parser**: Added parser module using BeautifulSoup4 for extracting dictionary data
-  - Pinyin extraction with proper formatting
-  - Vietnamese definition parsing
-  - Support for multiple word types and definitions
-- **Dependency Vendoring**: Implemented build system to vendor BeautifulSoup4
-  - Automated vendoring script in `justfile`
-  - Proper packaging for Anki addon distribution
-- **Release Automation**: Added `release.py` script for version management
-  - Automatic version bumping in manifest.json
-  - Git tag creation and changelog updates
-  - Lock file tracking in version control
-- **Test Fixtures**: Expanded test coverage with real-world examples
-  - Sample HTML pages from vndic.net (你们, 你, 公斤)
-  - Parser tests with actual dictionary content
+- Dictionary fetcher for vndic.net with BeautifulSoup4 parser
+- Notification system with tooltip messages
+- Build system with dependency vendoring (outputs to `build/` directory)
+- Release automation script (`scripts/release.py`)
+- Test fixtures with real HTML samples from vndic.net
 
 ### Changed
 
-- Adopted newspaper code structure (high-level methods before low-level)
-- Improved semantic naming in parser module
-- Enhanced build system to include vendor directory
-- Updated `__init__.py` to integrate fetcher and parser with UI hooks
+- Adopted newspaper code structure (high-level methods first)
+- UI hooks now automatically fill pinyin and Vietnamese fields
+- Removed square brackets from pinyin output
 
-### Development
+### Fixed
 
-- Added build commands to `justfile` for addon packaging
-- Updated `pyproject.toml` with beautifulsoup4 dependency
-- Created test data directory with real HTML samples
+- Chinese characters now properly URL-encoded in requests
+- Removed hardcoded version string from `__init__.py`
 
 ## [0.1.1] - 2025-10-12
 
