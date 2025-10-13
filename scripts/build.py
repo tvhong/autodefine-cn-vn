@@ -18,24 +18,22 @@ from pathlib import Path
 def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Build autodefine-cn-vn Anki addon")
-    parser.add_argument("--clean", action="store_true", help="Clean existing build artifacts")
     parser.add_argument("--output-dir", type=Path, help="Output directory (default: dist/)")
 
     args = parser.parse_args()
 
     try:
-        build(clean=args.clean, output_dir=args.output_dir)
+        build(output_dir=args.output_dir)
         return 0
     except Exception as e:
         print(f"❌ Build failed: {e}", file=sys.stderr)
         return 1
 
 
-def build(clean: bool = False, output_dir: Path | None = None) -> Path:
+def build(output_dir: Path | None = None) -> Path:
     """Build the Anki addon package.
 
     Args:
-        clean: Whether to clean existing build artifacts first
         output_dir: Directory for output .ankiaddon file (default: dist/)
 
     Returns:
@@ -55,9 +53,8 @@ def build(clean: bool = False, output_dir: Path | None = None) -> Path:
     version = get_version(pyproject_path)
     output_file = output_dir / f"autodefine_cn_vn-{version}.ankiaddon"
 
-    # Clean if requested
-    if clean and output_file.exists():
-        print(f"🧹 Cleaning existing package: {output_file}")
+    # Remove existing package if present
+    if output_file.exists():
         output_file.unlink()
 
     print("🚀 Building Anki addon package")

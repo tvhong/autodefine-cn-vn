@@ -59,10 +59,6 @@ clean:
 build:
     uv run python scripts/build.py
 
-# Build with clean (remove existing package first)
-build-clean:
-    uv run python scripts/build.py --clean
-
 # Clean build artifacts
 clean-build:
     rm -rf dist/ build/
