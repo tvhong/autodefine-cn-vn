@@ -17,14 +17,16 @@
 
 - [x] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
 - [x] Parse pinyin, and Vietnamese definition from it
-- [ ] Add additioonal test data: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
-- [ ] Fill out fields with pinyin and Vietnamese definition
+- [x] Add additioonal test data: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [ ] Package bs4 into the release somehow
+- [ ] Fill out fields with pinyin and Vietnamese definition
+- [ ] Download the data and parse
 
 ### 0.2.1: Clean up
 
 - [ ] Make ConfigManager a singleton
 - [ ] Create a hook so that when the config is edited, run ConfigManager.load_config again
+- [ ] Update claude.md
 
 ## 0.3.0: Support audio
 
