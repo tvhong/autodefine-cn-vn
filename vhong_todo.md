@@ -27,6 +27,7 @@
 ## 0.3.0: Support audio
 
 - [ ] Download the audio into appropriate place
+  - Example: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
 - [ ] Link it to the card
 
 ## 0.x: Nice to have features
