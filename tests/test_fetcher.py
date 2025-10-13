@@ -217,7 +217,7 @@ class TestParseDictionaryContent:
         # This is the actual HTML structure from vndic.net for the word 公斤
         from pathlib import Path
 
-        asset_path = Path(__file__).parent / "assets" / "dict_page_gongjin.html"
+        asset_path = Path(__file__).parent / "assets" / "vndic_net_gongjin.html"
         html_content = asset_path.read_text(encoding="utf-8")
 
         result = parse_dictionary_content(html_content)
@@ -231,7 +231,7 @@ class TestParseDictionaryContent:
         # This is the actual HTML structure from vndic.net for the word 你们
         from pathlib import Path
 
-        asset_path = Path(__file__).parent / "assets" / "dict_page_nimen.html"
+        asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
         html_content = asset_path.read_text(encoding="utf-8")
 
         result = parse_dictionary_content(html_content)
@@ -246,7 +246,7 @@ class TestParseDictionaryContent:
         # This is the actual HTML structure from vndic.net for the word 你
         from pathlib import Path
 
-        asset_path = Path(__file__).parent / "assets" / "dict_page_ni.html"
+        asset_path = Path(__file__).parent / "assets" / "vndic_net_ni.html"
         html_content = asset_path.read_text(encoding="utf-8")
 
         result = parse_dictionary_content(html_content)
