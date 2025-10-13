@@ -5,12 +5,20 @@ This addon automatically populates Chinese vocabulary cards with Vietnamese tran
 pinyin pronunciation, definitions, and audio pronunciation.
 """
 
-from anki.hooks import addHook
-from aqt import mw
-from aqt.qt import QAction
-from aqt.utils import showInfo
+import sys
+from pathlib import Path
 
-from autodefine_cn_vn.ui_hooks import init_ui_hooks
+# Add vendor directory to sys.path for bundled dependencies (bs4, soupsieve, etc.)
+vendor_dir = Path(__file__).parent / "vendor"
+if vendor_dir.exists() and str(vendor_dir) not in sys.path:
+    sys.path.insert(0, str(vendor_dir))
+
+from anki.hooks import addHook  # noqa: E402
+from aqt import mw  # noqa: E402
+from aqt.qt import QAction  # noqa: E402
+from aqt.utils import showInfo  # noqa: E402
+
+from autodefine_cn_vn.ui_hooks import init_ui_hooks  # noqa: E402
 
 __version__ = "1.0.0"
 __author__ = "Vy Hong"

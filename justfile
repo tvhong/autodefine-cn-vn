@@ -57,8 +57,16 @@ clean:
 
 # Build Anki addon package
 build:
-    @echo "Building Anki addon package..."
-    @echo "TODO: Implement build script"
+    uv run python scripts/build.py
+
+# Build with clean (remove existing package first)
+build-clean:
+    uv run python scripts/build.py --clean
+
+# Clean build artifacts
+clean-build:
+    rm -rf dist/ build/
+    rm -rf src/autodefine_cn_vn/vendor/
 
 # Run Anki with the addon for testing
 run-anki:

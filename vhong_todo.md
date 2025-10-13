@@ -18,7 +18,7 @@
 - [x] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
 - [x] Parse pinyin, and Vietnamese definition from it
 - [x] Add additioonal test data: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
-- [ ] Package bs4 into the release somehow
+- [x] Package bs4 into the release somehow
 - [ ] Fill out fields with pinyin and Vietnamese definition
 - [ ] Download the data and parse
 
