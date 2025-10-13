@@ -13,7 +13,7 @@
 - [x] Make ui_hooks a class?
 - [x] Create field utility functions (get_field, set_field) with tests
 
-### 0.1.2: Pull definition from remote website
+### 0.1.2: Pull definition from remote website (MVP)
 
 - [x] Download the webpage from api_settings.source (with {} replaced with the chinese word) into memory
 - [x] Parse pinyin, and Vietnamese definition from it
@@ -22,17 +22,12 @@
 - [x] Fill out fields with pinyin and Vietnamese definition
 - [x] Download the data and parse
 - [x] Update claude.md
-- [ ] Test that it actually works
-  - [ ] Fixing url encoding stuff
+- [x] Test that it actually works
+  - [x] Fixing url encoding stuff
+- [x] Make updating release easier for manual testing
+- [x] Add on name should include version for ease of tracking
 
-### 0.1.3: Clean up
-
-- [ ] Make updating release easier for manual testing
-- [ ] Add on name should include version for ease of tracking
-- [ ] Make ConfigManager a singleton
-- [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again
-
-## 0.2.0: Support audio
+## 0.2.0: Support audio and sample sentences
 
 - [ ] Download the audio into appropriate places
   - Example: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
@@ -42,6 +37,8 @@
 
 - [ ] Use a typed class for config
 - [ ] Remove retry config
+- [ ] Make ConfigManager a singleton
+- [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again
 
 ### 0.1.x: Support sample sentences
 
@@ -59,3 +56,4 @@
 - [ ] Have a nice icon
 - [ ] Support default tags such as "language::chinese" as well
 - [ ] Make this more generic for different type of translators
+- [ ] Support multiple card types

@@ -2,6 +2,7 @@
 """Release script for autodefine-cn-vn."""
 
 import argparse
+import json
 import re
 import subprocess
 import sys
@@ -171,6 +172,9 @@ def release(
         print("🔍 Dry run mode - no changes will be made")
         print()
         print(f"Would update version in {pyproject_path}")
+        manifest_path = pyproject_path.parent / "src" / "autodefine_cn_vn" / "manifest.json"
+        if manifest_path.exists():
+            print(f"Would update version in {manifest_path}")
         if not skip_ci:
             print("Would run CI checks")
         print(f"Would create commit: 'Bump version to {new_version}'")
@@ -183,8 +187,10 @@ def release(
 
     try:
         # Step 1: Update version
-        print("📝 Step 1/4: Updating version in pyproject.toml...")
+        print("📝 Step 1/4: Updating version in pyproject.toml and manifest.json...")
         update_version_in_file(pyproject_path, new_version)
+        manifest_path = pyproject_path.parent / "src" / "autodefine_cn_vn" / "manifest.json"
+        update_manifest_version(manifest_path, new_version)
         print(f"✓ Version updated to {new_version}")
         print()
 
@@ -245,7 +251,15 @@ def run_ci_checks() -> bool:
 
 def create_commit(version: Version) -> None:
     """Create a git commit for the version bump."""
-    run_command(["git", "add", "pyproject.toml", "uv.lock"])
+    run_command(
+        [
+            "git",
+            "add",
+            "pyproject.toml",
+            "uv.lock",
+            "src/autodefine_cn_vn/manifest.json",
+        ]
+    )
     commit_message = f"Bump version to {version}\n\n"
     run_command(["git", "commit", "-m", commit_message])
 
@@ -261,6 +275,9 @@ def rollback_changes(pyproject_path: Path) -> None:
     """Rollback changes if something goes wrong."""
     print("⚠️  Rolling back changes...")
     run_command(["git", "restore", str(pyproject_path)], check=False)
+    manifest_path = pyproject_path.parent / "src" / "autodefine_cn_vn" / "manifest.json"
+    if manifest_path.exists():
+        run_command(["git", "restore", str(manifest_path)], check=False)
 
 
 def update_version_in_file(pyproject_path: Path, new_version: Version) -> None:
@@ -273,6 +290,28 @@ def update_version_in_file(pyproject_path: Path, new_version: Version) -> None:
         flags=re.MULTILINE,
     )
     pyproject_path.write_text(updated_content)
+
+
+def update_manifest_version(manifest_path: Path, new_version: Version) -> None:
+    """Update version in manifest.json name field."""
+    if not manifest_path.exists():
+        return
+
+    with open(manifest_path, "r") as f:
+        manifest_data = json.load(f)
+
+    # Extract base name without version
+    current_name = manifest_data.get("name", "")
+    base_name = re.sub(r"\s+v\d+\.\d+\.\d+$", "", current_name)
+    if not base_name:
+        base_name = current_name
+
+    # Update with new version
+    manifest_data["name"] = f"{base_name} v{new_version}"
+
+    with open(manifest_path, "w") as f:
+        json.dump(manifest_data, f, indent=2)
+        f.write("\n")  # Add trailing newline
 
 
 def check_working_directory_clean() -> bool:
