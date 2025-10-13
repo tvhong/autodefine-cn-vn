@@ -56,7 +56,7 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
         >>> html = '<FONT COLOR=#7F0000>[gōngjīn]</FONT>'
         >>> result = parse_dictionary_content(html)
         >>> result['pinyin']
-        '[gōngjīn]'
+        'gōngjīn'
     """
     soup = BeautifulSoup(html_content, "html.parser")
 
@@ -65,6 +65,9 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
     font_tag = soup.find("font", {"color": "#7F0000"})
     if font_tag:
         pinyin = font_tag.get_text(strip=True)
+        # Remove square brackets if present
+        if pinyin.startswith("[") and pinyin.endswith("]"):
+            pinyin = pinyin[1:-1]
 
     # Extract Vietnamese definition from the table containing TD elements with class="tacon"
     vietnamese = ""

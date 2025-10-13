@@ -146,7 +146,7 @@ class TestParseDictionaryContent:
 
         result = parse_dictionary_content(html_content)
 
-        assert result["pinyin"] == "[gōngjīn]"
+        assert result["pinyin"] == "gōngjīn"
         assert (
             result["vietnamese"]
             == "ki-lô-gam。国际公制重量或质量主单位，一公斤等于一千克，合二市斤。"
@@ -163,7 +163,7 @@ class TestParseDictionaryContent:
 
         result = parse_dictionary_content(html_content)
 
-        assert result["pinyin"] == "[nǐhǎo]"
+        assert result["pinyin"] == "nǐhǎo"
         assert result["vietnamese"] == "xin chào"
 
     def test_parse_content_missing_pinyin(self):
@@ -191,7 +191,7 @@ class TestParseDictionaryContent:
 
         result = parse_dictionary_content(html_content)
 
-        assert result["pinyin"] == "[nǐhǎo]"
+        assert result["pinyin"] == "nǐhǎo"
         assert result["vietnamese"] == ""
 
     def test_parse_content_missing_table(self):
@@ -222,7 +222,7 @@ class TestParseDictionaryContent:
 
         result = parse_dictionary_content(html_content)
 
-        assert result["pinyin"] == "[gōngjīn]"
+        assert result["pinyin"] == "gōngjīn"
         assert "ki-lô-gam" in result["vietnamese"]
         assert "国际公制重量或质量主单位" in result["vietnamese"]
 
@@ -236,7 +236,7 @@ class TestParseDictionaryContent:
 
         result = parse_dictionary_content(html_content)
 
-        assert result["pinyin"] == "[nǐ·men]"
+        assert result["pinyin"] == "nǐ·men"
         assert "các ông" in result["vietnamese"]
         assert "các bà" in result["vietnamese"]
         assert "代词" in result["vietnamese"]
