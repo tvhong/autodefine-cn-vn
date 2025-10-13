@@ -78,7 +78,7 @@ def build(clean: bool = False, output_dir: Path | None = None) -> Path:
 
         # Step 2: Install vendor dependencies
         vendor_dir = build_dir / "vendor"
-        install_vendor_dependencies(vendor_dir)
+        install_vendor_dependencies(vendor_dir, project_root)
 
         # Step 3: Create .ankiaddon package
         create_ankiaddon_package(build_dir, output_file)
@@ -108,44 +108,35 @@ def copy_addon_files(src_dir: Path, dest_dir: Path) -> None:
     print("✓ Addon files copied")
 
 
-def install_vendor_dependencies(vendor_dir: Path) -> None:
+def install_vendor_dependencies(vendor_dir: Path, project_root: Path) -> None:
     """Install bs4 and dependencies into vendor directory.
 
     Args:
         vendor_dir: Path to vendor directory where packages will be installed
+        project_root: Path to project root directory
     """
     print(f"📦 Installing vendor dependencies to {vendor_dir}...")
 
     # Ensure vendor directory exists
     vendor_dir.mkdir(parents=True, exist_ok=True)
 
-    # Install beautifulsoup4 and its dependencies
-    # We use pip install with --target to install into the vendor directory
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "--target",
-            str(vendor_dir),
-            "--no-deps",  # We'll install deps explicitly
-            "beautifulsoup4>=4.12.0",
-        ],
-        check=True,
-    )
+    # Get exact versions from uv.lock
+    lock_file = project_root / "uv.lock"
+    versions = get_locked_versions(lock_file, ["beautifulsoup4", "soupsieve", "typing-extensions"])
 
-    # Install bs4 dependencies
+    print(f"  Using locked versions: {versions}")
+
+    # Install packages with exact versions using uv
+    packages = [f"{pkg}=={ver}" for pkg, ver in versions.items()]
     subprocess.run(
         [
-            sys.executable,
-            "-m",
+            "uv",
             "pip",
             "install",
             "--target",
             str(vendor_dir),
-            "soupsieve",
-            "typing-extensions",
+            "--no-deps",
+            *packages,
         ],
         check=True,
     )
@@ -184,6 +175,28 @@ def get_version(pyproject_path: Path) -> str:
     with open(pyproject_path, "rb") as f:
         data = tomllib.load(f)
     return data["project"]["version"]
+
+
+def get_locked_versions(lock_file: Path, package_names: list[str]) -> dict[str, str]:
+    """Get locked package versions from uv.lock.
+
+    Args:
+        lock_file: Path to uv.lock file
+        package_names: List of package names to get versions for
+
+    Returns:
+        Dictionary mapping package name to version
+    """
+    with open(lock_file, "rb") as f:
+        lock_data = tomllib.load(f)
+
+    versions = {}
+    for package in lock_data.get("package", []):
+        name = package.get("name")
+        if name in package_names:
+            versions[name] = package.get("version")
+
+    return versions
 
 
 if __name__ == "__main__":
