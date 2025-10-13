@@ -20,9 +20,6 @@ from aqt.utils import showInfo  # noqa: E402
 
 from autodefine_cn_vn.ui_hooks import init_ui_hooks  # noqa: E402
 
-__version__ = "1.0.0"
-__author__ = "Vy Hong"
-
 
 def on_addon_loaded():
     """Initialize the addon when Anki loads."""
