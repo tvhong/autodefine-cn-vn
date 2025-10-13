@@ -76,12 +76,15 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
         # Only get direct child TR elements to avoid nested tables
         rows = table.find_all("tr", recursive=False)
         if len(rows) >= 2:
-            # Check if this table has TD elements with class="tacon"
-            second_row = rows[1]
-            tds = second_row.find_all("td", class_="tacon", recursive=False)
-            if tds:
-                # Get the last TD which contains the Vietnamese definition
-                vietnamese = tds[-1].get_text(strip=True)
+            # Look for the first row with 3 TDs (definition row)
+            # Rows with 2 TDs typically contain metadata like pinyin, radicals, etc.
+            for row in rows[1:]:  # Skip first row (usually contains pinyin)
+                tds = row.find_all("td", class_="tacon", recursive=False)
+                if len(tds) >= 3:
+                    # Get the last TD which contains the Vietnamese definition
+                    vietnamese = tds[-1].get_text(strip=True)
+                    break
+            if vietnamese:
                 break
 
     return {"pinyin": pinyin, "vietnamese": vietnamese}

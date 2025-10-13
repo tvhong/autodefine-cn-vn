@@ -240,3 +240,19 @@ class TestParseDictionaryContent:
         assert "các ông" in result["vietnamese"]
         assert "các bà" in result["vietnamese"]
         assert "代词" in result["vietnamese"]
+
+    def test_parse_real_dictionary_page_ni(self):
+        """Test parsing a real dictionary page HTML (你 = you)."""
+        # This is the actual HTML structure from vndic.net for the word 你
+        from pathlib import Path
+
+        asset_path = Path(__file__).parent / "assets" / "dict_page_ni.html"
+        html_content = asset_path.read_text(encoding="utf-8")
+
+        result = parse_dictionary_content(html_content)
+
+        breakpoint()
+        assert result["pinyin"] == "nǐ"
+        assert "anh" in result["vietnamese"]
+        assert "chị" in result["vietnamese"]
+        assert "称对方(一个人)" in result["vietnamese"]
