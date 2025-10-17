@@ -9,8 +9,8 @@
 ### 0.2.1: Clean up
 
 - [x] Use a typed class for config
-- [ ] Add a version field for config
-- [ ] Remove retry config
+- [x] Add a version field for config
+- [x] Remove retry config
 
 ### 0.2.x: Support sample sentences
 
