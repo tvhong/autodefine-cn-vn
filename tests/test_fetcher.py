@@ -437,9 +437,8 @@ class TestParseSampleSentences:
         <TR><TD class="tacon" colspan=3 width=54> </TD>
         <TD class="tacon"><FONT COLOR=#7F7F7F>trong anh em các anh, ai là anh cả?</FONT></TD></TR>
         """
-        chinese_word = "你们"
 
-        result = parse_sample_sentences(html_content, chinese_word)
+        result = parse_sample_sentences(html_content)
 
         assert len(result) == 2
         assert result[0]["chinese"] == "你们歇一会儿，让我们接着干。"
@@ -453,9 +452,8 @@ class TestParseSampleSentences:
         <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
         <TD class="tacon" colspan=2><FONT COLOR=#7F0000>[nǐhǎo]</FONT></TD></TR></TABLE>
         """
-        chinese_word = "你好"
 
-        result = parse_sample_sentences(html_content, chinese_word)
+        result = parse_sample_sentences(html_content)
 
         assert result == []
 
@@ -467,9 +465,8 @@ class TestParseSampleSentences:
         <TR><TD class="tacon" colspan=3 width=54> </TD>
         <TD class="tacon"><FONT COLOR=#7F7F7F>Tôi yêu bạn.</FONT></TD></TR>
         """
-        chinese_word = "你"
 
-        result = parse_sample_sentences(html_content, chinese_word)
+        result = parse_sample_sentences(html_content)
 
         assert len(result) == 1
         assert result[0]["chinese"] == "我爱你。"
@@ -483,9 +480,8 @@ class TestParseSampleSentences:
         <TR><TD class="tacon" colspan=3 width=54> </TD>
         <TD class="tacon"><FONT COLOR=#7F7F7F>Bạn khỏe không? Còn bạn?</FONT></TD></TR>
         """
-        chinese_word = "你"
 
-        result = parse_sample_sentences(html_content, chinese_word)
+        result = parse_sample_sentences(html_content)
 
         assert len(result) == 1
         assert result[0]["chinese"] == "你好吗？你呢？"
@@ -498,9 +494,8 @@ class TestParseSampleSentences:
         <TR><TD class="tacon" colspan=3 width=54> </TD>
         <TD class="tacon"><FONT COLOR=#7F7F7F>  Xin chào  </FONT></TD></TR>
         """
-        chinese_word = "你"
 
-        result = parse_sample_sentences(html_content, chinese_word)
+        result = parse_sample_sentences(html_content)
 
         assert len(result) == 1
         # Whitespace should be stripped
@@ -513,9 +508,8 @@ class TestParseSampleSentences:
 
         asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
         html_content = asset_path.read_text(encoding="utf-8")
-        chinese_word = "你们"
 
-        result = parse_sample_sentences(html_content, chinese_word)
+        result = parse_sample_sentences(html_content)
 
         assert len(result) == 2
         assert "你们" in result[0]["chinese"]

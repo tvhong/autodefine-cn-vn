@@ -92,18 +92,8 @@ def parse_dictionary_content(html_content: str) -> dict[str, str | list[dict[str
         end_idx = onclick.find("'", start_idx)
         audio_url = onclick[start_idx:end_idx]
 
-    # Extract Chinese word from <span class="thisword"> tag
-    chinese_word = ""
-    thisword_span = soup.find("span", class_="thisword")
-    if thisword_span:
-        font_tag = thisword_span.find("font")
-        if font_tag:
-            chinese_word = font_tag.get_text(strip=True)
-
     # Extract sample sentences
-    sentences = []
-    if chinese_word:
-        sentences = parse_sample_sentences(html_content, chinese_word)
+    sentences = parse_sample_sentences(html_content)
 
     return {
         "pinyin": pinyin,
@@ -113,12 +103,11 @@ def parse_dictionary_content(html_content: str) -> dict[str, str | list[dict[str
     }
 
 
-def parse_sample_sentences(html_content: str, chinese_word: str) -> list[dict[str, str]]:
+def parse_sample_sentences(html_content: str) -> list[dict[str, str]]:
     """Parse sample sentences from dictionary HTML content.
 
     Args:
         html_content: The HTML content to parse
-        chinese_word: The Chinese word being looked up (currently unused)
 
     Returns:
         List of dictionaries with 'chinese' and 'vietnamese' keys.
@@ -128,7 +117,7 @@ def parse_sample_sentences(html_content: str, chinese_word: str) -> list[dict[st
         >>> html = '''<TR><TD><IMG src=img/dict/72B02D27.png></TD>
         ...           <TD><FONT color=#FF0000>我爱你。</FONT></TD></TR>
         ...           <TR><TD></TD><TD><FONT COLOR=#7F7F7F>Tôi yêu bạn.</FONT></TD></TR>'''
-        >>> result = parse_sample_sentences(html, "你")
+        >>> result = parse_sample_sentences(html)
         >>> result[0]['chinese']
         '我爱你。'
     """
