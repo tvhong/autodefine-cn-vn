@@ -15,18 +15,21 @@ from autodefine_cn_vn.ui_hooks import (
     setup_editor_buttons,
 )
 
+# Constant field mapping used across tests
+FIELD_MAPPING = {
+    "chinese_field": "Chinese",
+    "pinyin_field": "Pinyin",
+    "vietnamese_field": "Vietnamese",
+    "audio_field": "Audio",
+}
+
 
 @pytest.fixture
 def mock_mw():
     """Mock Anki's main window."""
     mw = MagicMock()
     mw.addonManager.getConfig.return_value = {
-        "field_mapping": {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        },
+        "field_mapping": FIELD_MAPPING,
         "shortcuts": {"auto_define_shortcut": "Ctrl+Alt+D"},
         "api_settings": {
             "source": "http://2.vndic.net/index.php?word={}&dict=cn_vi",
@@ -147,14 +150,8 @@ class TestFillPinyinField:
     def test_fills_pinyin_field_when_present(self, mock_editor):
         """Test that fill_pinyin_field fills the pinyin field when data is present."""
         parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
-        result = fill_pinyin_field(mock_editor, parsed_data, field_mapping)
+        result = fill_pinyin_field(mock_editor, parsed_data, FIELD_MAPPING)
 
         assert result is True
         assert mock_editor.note.fields[1] == "nǐhǎo"
@@ -163,14 +160,8 @@ class TestFillPinyinField:
     def test_returns_false_when_pinyin_empty(self, mock_editor):
         """Test that fill_pinyin_field returns False when pinyin is empty."""
         parsed_data = {"pinyin": "", "vietnamese": "xin chào"}
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
-        result = fill_pinyin_field(mock_editor, parsed_data, field_mapping)
+        result = fill_pinyin_field(mock_editor, parsed_data, FIELD_MAPPING)
 
         assert result is False
         mock_editor.loadNote.assert_not_called()
@@ -178,14 +169,8 @@ class TestFillPinyinField:
     def test_returns_false_when_pinyin_missing(self, mock_editor):
         """Test that fill_pinyin_field returns False when pinyin key is missing."""
         parsed_data = {"vietnamese": "xin chào"}
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
-        result = fill_pinyin_field(mock_editor, parsed_data, field_mapping)
+        result = fill_pinyin_field(mock_editor, parsed_data, FIELD_MAPPING)
 
         assert result is False
         mock_editor.loadNote.assert_not_called()
@@ -197,14 +182,8 @@ class TestFillVietnameseField:
     def test_fills_vietnamese_field_when_present(self, mock_editor):
         """Test that fill_vietnamese_field fills the vietnamese field when data is present."""
         parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
-        result = fill_vietnamese_field(mock_editor, parsed_data, field_mapping)
+        result = fill_vietnamese_field(mock_editor, parsed_data, FIELD_MAPPING)
 
         assert result is True
         assert mock_editor.note.fields[2] == "xin chào"
@@ -213,14 +192,8 @@ class TestFillVietnameseField:
     def test_returns_false_when_vietnamese_empty(self, mock_editor):
         """Test that fill_vietnamese_field returns False when vietnamese is empty."""
         parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ""}
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
-        result = fill_vietnamese_field(mock_editor, parsed_data, field_mapping)
+        result = fill_vietnamese_field(mock_editor, parsed_data, FIELD_MAPPING)
 
         assert result is False
         mock_editor.loadNote.assert_not_called()
@@ -228,14 +201,8 @@ class TestFillVietnameseField:
     def test_returns_false_when_vietnamese_missing(self, mock_editor):
         """Test that fill_vietnamese_field returns False when vietnamese key is missing."""
         parsed_data = {"pinyin": "nǐhǎo"}
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
-        result = fill_vietnamese_field(mock_editor, parsed_data, field_mapping)
+        result = fill_vietnamese_field(mock_editor, parsed_data, FIELD_MAPPING)
 
         assert result is False
         mock_editor.loadNote.assert_not_called()
@@ -251,12 +218,6 @@ class TestFillAudioField:
             "vietnamese": "xin chào",
             "audio_url": "http://example.com/audio.mp3",
         }
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
         with patch("autodefine_cn_vn.ui_hooks.download_audio") as mock_download_audio:
             mock_download_audio.return_value = "autodefine_cn_vn_你好.mp3"
@@ -264,7 +225,7 @@ class TestFillAudioField:
             result = fill_audio_field(
                 mock_editor,
                 parsed_data,
-                field_mapping,
+                FIELD_MAPPING,
                 "你好",
                 "http://2.vndic.net/index.php?word={}&dict=cn_vi",
                 10,
@@ -284,17 +245,11 @@ class TestFillAudioField:
     def test_returns_false_when_audio_url_empty(self, mock_editor):
         """Test that fill_audio_field returns False when audio URL is empty."""
         parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào", "audio_url": ""}
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
         result = fill_audio_field(
             mock_editor,
             parsed_data,
-            field_mapping,
+            FIELD_MAPPING,
             "你好",
             "http://2.vndic.net/index.php?word={}&dict=cn_vi",
             10,
@@ -306,17 +261,11 @@ class TestFillAudioField:
     def test_returns_false_when_audio_url_missing(self, mock_editor):
         """Test that fill_audio_field returns False when audio_url key is missing."""
         parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
         result = fill_audio_field(
             mock_editor,
             parsed_data,
-            field_mapping,
+            FIELD_MAPPING,
             "你好",
             "http://2.vndic.net/index.php?word={}&dict=cn_vi",
             10,
@@ -335,17 +284,11 @@ class TestFillAudioField:
             "vietnamese": "xin chào",
             "audio_url": "http://example.com/audio.mp3",
         }
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
         result = fill_audio_field(
             editor,
             parsed_data,
-            field_mapping,
+            FIELD_MAPPING,
             "你好",
             "http://2.vndic.net/index.php?word={}&dict=cn_vi",
             10,
@@ -360,12 +303,6 @@ class TestFillAudioField:
             "vietnamese": "xin chào",
             "audio_url": "http://example.com/audio.mp3",
         }
-        field_mapping = {
-            "chinese_field": "Chinese",
-            "pinyin_field": "Pinyin",
-            "vietnamese_field": "Vietnamese",
-            "audio_field": "Audio",
-        }
 
         with (
             patch("autodefine_cn_vn.ui_hooks.download_audio") as mock_download_audio,
@@ -376,7 +313,7 @@ class TestFillAudioField:
             result = fill_audio_field(
                 mock_editor,
                 parsed_data,
-                field_mapping,
+                FIELD_MAPPING,
                 "你好",
                 "http://2.vndic.net/index.php?word={}&dict=cn_vi",
                 10,
