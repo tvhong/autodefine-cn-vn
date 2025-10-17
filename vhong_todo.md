@@ -8,11 +8,9 @@
 
 ### 0.2.1: Clean up
 
-- [ ] Fix shortcut
-- [ ] Use a typed class for config
+- [x] Use a typed class for config
+- [ ] Add a version field for config
 - [ ] Remove retry config
-- [ ] Make ConfigManager a singleton
-- [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again
 
 ### 0.2.x: Support sample sentences
 
@@ -31,3 +29,9 @@
 - [ ] Support default tags such as "language::chinese" as well
 - [ ] Make this more generic for different types of translators
 - [ ] Support multiple card types
+- [ ] Fix shortcut
+
+### Won't do
+
+- [ ] Make ConfigManager a singleton
+- [ ] Create a hook so that when the config is edited in Anki UI, run ConfigManager.load_config again

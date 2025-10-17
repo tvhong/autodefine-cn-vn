@@ -45,46 +45,58 @@ class ConfigManager:
 
     def __init__(self):
         """Initialize the config manager and load configuration."""
-        self._config: dict[str, dict[str, str | int]] = self._load_config()
+        self._config: Config = self._load_config()
 
-    def get_field_mapping(self) -> dict[str, str]:
+    def get_config(self) -> Config:
+        """Get complete configuration.
+
+        Returns:
+            Complete configuration object.
+        """
+        return self._config
+
+    def get_field_mapping(self) -> FieldMapping:
         """Get field mapping configuration.
 
         Returns:
-            Dictionary mapping internal field names to Anki field names.
+            Field mapping configuration object.
         """
-        return cast(dict[str, str], self._config["field_mapping"])
+        return self._config.field_mapping
 
-    def get_shortcuts(self) -> dict[str, str]:
+    def get_shortcuts(self) -> Shortcuts:
         """Get keyboard shortcut configuration.
 
         Returns:
-            Dictionary of shortcut names to key combinations.
+            Shortcuts configuration object.
         """
-        return cast(dict[str, str], self._config["shortcuts"])
+        return self._config.shortcuts
 
-    def get_api_settings(self) -> dict[str, str | int]:
+    def get_api_settings(self) -> ApiSettings:
         """Get API settings configuration.
 
         Returns:
-            Dictionary containing API source URL, timeout, and retry settings.
+            API settings configuration object.
         """
-        return self._config["api_settings"]
+        return self._config.api_settings
 
     def reload_config(self) -> None:
         """Reload configuration from Anki's addon manager."""
         self._config = self._load_config()
 
-    def _load_config(self) -> dict[str, dict[str, str | int]]:
+    def _load_config(self) -> Config:
         """Load configuration from Anki's addon manager.
 
         Returns:
-            Configuration dictionary
+            Configuration object constructed from addon settings.
         """
         addon_name = __name__.split(".")[0]
-        config = mw.addonManager.getConfig(addon_name)
+        config_dict = mw.addonManager.getConfig(addon_name)
 
-        if not config:
+        if not config_dict:
             raise ValueError("Failed to load configuration for AutoDefine CN-VN addon.")
 
-        return config
+        return Config(
+            field_mapping=FieldMapping(**config_dict["field_mapping"]),
+            shortcuts=Shortcuts(**config_dict["shortcuts"]),
+            api_settings=ApiSettings(**config_dict["api_settings"]),
+        )

@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from anki.hooks import addHook
 from anki.notes import Note
 
-from autodefine_cn_vn.config_manager import ConfigManager
+from autodefine_cn_vn.config_manager import ConfigManager, FieldMapping
 from autodefine_cn_vn.fetcher import (
     fetch_audio,
     fetch_webpage,
@@ -37,7 +37,7 @@ def setup_editor_buttons(buttons: list[str], editor: "Editor") -> list[str]:
     """
     config_manager = ConfigManager()
     shortcuts = config_manager.get_shortcuts()
-    shortcut = shortcuts["auto_define_shortcut"]
+    shortcut = shortcuts.auto_define_shortcut
 
     button = editor.addButton(
         icon=None,
@@ -73,8 +73,8 @@ def auto_define(editor: "Editor") -> None:
     api_settings = config_manager.get_api_settings()
 
     # Format URL and fetch webpage
-    url_template = str(api_settings["source"])
-    timeout = int(api_settings["timeout_seconds"])
+    url_template = api_settings.source
+    timeout = api_settings.timeout_seconds
     url = format_url(url_template, chinese_text)
 
     try:
@@ -112,14 +112,14 @@ def auto_define(editor: "Editor") -> None:
 
 
 def fill_pinyin_field(
-    editor: "Editor", parsed_data: dict[str, str], field_mapping: dict[str, str]
+    editor: "Editor", parsed_data: dict[str, str], field_mapping: FieldMapping
 ) -> bool:
     """Fill pinyin field from parsed data.
 
     Args:
         editor: Anki editor instance
         parsed_data: Dictionary containing parsed pinyin and vietnamese data
-        field_mapping: Dictionary mapping field names to note type fields
+        field_mapping: Field mapping configuration object
 
     Returns:
         bool: True if pinyin was filled, False otherwise
@@ -129,7 +129,7 @@ def fill_pinyin_field(
         insert_into_field(
             editor,
             pinyin,
-            field_mapping["pinyin_field"],
+            field_mapping.pinyin_field,
             overwrite=True,
         )
         return True
@@ -137,14 +137,14 @@ def fill_pinyin_field(
 
 
 def fill_vietnamese_field(
-    editor: "Editor", parsed_data: dict[str, str], field_mapping: dict[str, str]
+    editor: "Editor", parsed_data: dict[str, str], field_mapping: FieldMapping
 ) -> bool:
     """Fill vietnamese field from parsed data.
 
     Args:
         editor: Anki editor instance
         parsed_data: Dictionary containing parsed pinyin and vietnamese data
-        field_mapping: Dictionary mapping field names to note type fields
+        field_mapping: Field mapping configuration object
 
     Returns:
         bool: True if vietnamese was filled, False otherwise
@@ -154,7 +154,7 @@ def fill_vietnamese_field(
         insert_into_field(
             editor,
             vietnamese,
-            field_mapping["vietnamese_field"],
+            field_mapping.vietnamese_field,
             overwrite=True,
         )
         return True
@@ -164,7 +164,7 @@ def fill_vietnamese_field(
 def fill_audio_field(
     editor: "Editor",
     parsed_data: dict[str, str],
-    field_mapping: dict[str, str],
+    field_mapping: FieldMapping,
     chinese_text: str,
     url_template: str,
     timeout: int,
@@ -174,7 +174,7 @@ def fill_audio_field(
     Args:
         editor: Anki editor instance
         parsed_data: Dictionary containing parsed data including audio_url
-        field_mapping: Dictionary mapping field names to note type fields
+        field_mapping: Field mapping configuration object
         chinese_text: Chinese text used for filename generation
         url_template: Template URL to extract base URL from
         timeout: Timeout for audio download in seconds
@@ -199,7 +199,7 @@ def fill_audio_field(
         insert_into_field(
             editor,
             audio_reference,
-            field_mapping["audio_field"],
+            field_mapping.audio_field,
             overwrite=True,
         )
         return True
@@ -262,7 +262,7 @@ def get_chinese_text(editor: "Editor") -> str:
     """
     config_manager = ConfigManager()
     field_mapping = config_manager.get_field_mapping()
-    chinese_field_name = field_mapping["chinese_field"]
+    chinese_field_name = field_mapping.chinese_field
 
     # Get the note and find the Chinese field
     note = editor.note

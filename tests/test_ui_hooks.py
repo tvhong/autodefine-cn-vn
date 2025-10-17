@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from autodefine_cn_vn.config_manager import FieldMapping
 from autodefine_cn_vn.ui_hooks import (
     auto_define,
     fill_audio_field,
@@ -16,14 +17,14 @@ from autodefine_cn_vn.ui_hooks import (
 )
 
 
-def get_field_mapping() -> dict[str, str]:
+def get_field_mapping() -> FieldMapping:
     """Return field mapping configuration for tests."""
-    return {
-        "chinese_field": "Chinese",
-        "pinyin_field": "Pinyin",
-        "vietnamese_field": "Vietnamese",
-        "audio_field": "Audio",
-    }
+    return FieldMapping(
+        chinese_field="Chinese",
+        pinyin_field="Pinyin",
+        vietnamese_field="Vietnamese",
+        audio_field="Audio",
+    )
 
 
 @pytest.fixture
@@ -31,7 +32,12 @@ def mock_mw():
     """Mock Anki's main window."""
     mw = MagicMock()
     mw.addonManager.getConfig.return_value = {
-        "field_mapping": get_field_mapping(),
+        "field_mapping": {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        },
         "shortcuts": {"auto_define_shortcut": "Ctrl+Alt+D"},
         "api_settings": {
             "source": "http://2.vndic.net/index.php?word={}&dict=cn_vi",

@@ -49,26 +49,26 @@ class TestConfigManager:
         config_manager = ConfigManager()
         field_mapping = config_manager.get_field_mapping()
 
-        assert field_mapping["chinese_field"] == "Chinese"
-        assert field_mapping["pinyin_field"] == "Pinyin"
-        assert field_mapping["vietnamese_field"] == "Vietnamese"
-        assert field_mapping["audio_field"] == "Audio"
+        assert field_mapping.chinese_field == "Chinese"
+        assert field_mapping.pinyin_field == "Pinyin"
+        assert field_mapping.vietnamese_field == "Vietnamese"
+        assert field_mapping.audio_field == "Audio"
 
     def test_get_shortcuts_returns_correct_values(self, mock_mw):
         """Test that get_shortcuts returns the correct shortcuts."""
         config_manager = ConfigManager()
         shortcuts = config_manager.get_shortcuts()
 
-        assert shortcuts["auto_define_shortcut"] == "Ctrl+Alt+D"
+        assert shortcuts.auto_define_shortcut == "Ctrl+Alt+D"
 
     def test_get_api_settings_returns_correct_values(self, mock_mw):
         """Test that get_api_settings returns the correct API settings."""
         config_manager = ConfigManager()
         api_settings = config_manager.get_api_settings()
 
-        assert api_settings["source"] == "http://2.vndic.net/index.php?word={}&dict=cn_vi"
-        assert api_settings["timeout_seconds"] == 10
-        assert api_settings["max_retries"] == 3
+        assert api_settings.source == "http://2.vndic.net/index.php?word={}&dict=cn_vi"
+        assert api_settings.timeout_seconds == 10
+        assert api_settings.max_retries == 3
 
     def test_reload_config_refreshes_from_anki(self, mock_mw):
         """Test that reload_config refreshes config from Anki."""
@@ -77,12 +77,21 @@ class TestConfigManager:
 
         # Simulate external config change
         mock_mw.addonManager.getConfig.return_value = {
-            "field_mapping": {"chinese_field": "UpdatedChinese"},
-            "shortcuts": {},
-            "api_settings": {},
+            "field_mapping": {
+                "chinese_field": "UpdatedChinese",
+                "pinyin_field": "Pinyin",
+                "vietnamese_field": "Vietnamese",
+                "audio_field": "Audio",
+            },
+            "shortcuts": {"auto_define_shortcut": "Ctrl+Alt+D"},
+            "api_settings": {
+                "source": "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+                "timeout_seconds": 10,
+                "max_retries": 3,
+            },
         }
 
         config_manager.reload_config()
 
         assert mock_mw.addonManager.getConfig.call_count == initial_call_count + 1
-        assert config_manager._config["field_mapping"]["chinese_field"] == "UpdatedChinese"
+        assert config_manager._config.field_mapping.chinese_field == "UpdatedChinese"
