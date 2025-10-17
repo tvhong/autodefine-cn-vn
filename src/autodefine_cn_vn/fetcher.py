@@ -74,7 +74,7 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
     # Extract Vietnamese definition by finding the TD after the one with the marker image
     vietnamese = ""
     # Find the img tag with the specific marker image
-    marker_img = soup.find("img", src=lambda x: x and "img/dict/CB1FF077.png" in x)
+    marker_img = soup.find("img", src=lambda x: bool(x) and "img/dict/CB1FF077.png" in x)
     if marker_img:
         # Find the parent TD of the marker image
         marker_td = marker_img.find_parent("td")
@@ -86,7 +86,7 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
 
     # Extract audio URL from soundManager.play() call
     audio_url = ""
-    audio_span = soup.find("span", onclick=lambda x: x and "soundManager.play" in x)
+    audio_span = soup.find("span", onclick=lambda x: bool(x) and "soundManager.play" in x)
     if audio_span:
         onclick = audio_span.get("onclick", "")
         start_idx = onclick.find("'") + 1
