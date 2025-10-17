@@ -6,6 +6,9 @@ import pytest
 
 from autodefine_cn_vn.ui_hooks import (
     auto_define,
+    fill_audio_field,
+    fill_pinyin_field,
+    fill_vietnamese_field,
     get_chinese_text,
     init_ui_hooks,
     insert_into_field,
@@ -136,6 +139,253 @@ class TestInsertIntoField:
         insert_into_field(editor, "text", "Pinyin", overwrite=True)
 
         # Should not raise an error, just return early
+
+
+class TestFillPinyinField:
+    """Tests for fill_pinyin_field helper function."""
+
+    def test_fills_pinyin_field_when_present(self, mock_editor):
+        """Test that fill_pinyin_field fills the pinyin field when data is present."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_pinyin_field(mock_editor, parsed_data, field_mapping)
+
+        assert result is True
+        assert mock_editor.note.fields[1] == "nǐhǎo"
+        mock_editor.loadNote.assert_called_once()
+
+    def test_returns_false_when_pinyin_empty(self, mock_editor):
+        """Test that fill_pinyin_field returns False when pinyin is empty."""
+        parsed_data = {"pinyin": "", "vietnamese": "xin chào"}
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_pinyin_field(mock_editor, parsed_data, field_mapping)
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+    def test_returns_false_when_pinyin_missing(self, mock_editor):
+        """Test that fill_pinyin_field returns False when pinyin key is missing."""
+        parsed_data = {"vietnamese": "xin chào"}
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_pinyin_field(mock_editor, parsed_data, field_mapping)
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+
+class TestFillVietnameseField:
+    """Tests for fill_vietnamese_field helper function."""
+
+    def test_fills_vietnamese_field_when_present(self, mock_editor):
+        """Test that fill_vietnamese_field fills the vietnamese field when data is present."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_vietnamese_field(mock_editor, parsed_data, field_mapping)
+
+        assert result is True
+        assert mock_editor.note.fields[2] == "xin chào"
+        mock_editor.loadNote.assert_called_once()
+
+    def test_returns_false_when_vietnamese_empty(self, mock_editor):
+        """Test that fill_vietnamese_field returns False when vietnamese is empty."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ""}
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_vietnamese_field(mock_editor, parsed_data, field_mapping)
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+    def test_returns_false_when_vietnamese_missing(self, mock_editor):
+        """Test that fill_vietnamese_field returns False when vietnamese key is missing."""
+        parsed_data = {"pinyin": "nǐhǎo"}
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_vietnamese_field(mock_editor, parsed_data, field_mapping)
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+
+class TestFillAudioField:
+    """Tests for fill_audio_field helper function."""
+
+    def test_downloads_and_fills_audio_field_when_present(self, mock_editor):
+        """Test that fill_audio_field downloads and fills audio when URL is present."""
+        parsed_data = {
+            "pinyin": "nǐhǎo",
+            "vietnamese": "xin chào",
+            "audio_url": "http://example.com/audio.mp3",
+        }
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        with patch("autodefine_cn_vn.ui_hooks.download_audio") as mock_download_audio:
+            mock_download_audio.return_value = "autodefine_cn_vn_你好.mp3"
+
+            result = fill_audio_field(
+                mock_editor,
+                parsed_data,
+                field_mapping,
+                "你好",
+                "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+                10,
+            )
+
+            assert result is True
+            assert mock_editor.note.fields[3] == "[sound:autodefine_cn_vn_你好.mp3]"
+            mock_editor.loadNote.assert_called_once()
+            mock_download_audio.assert_called_once_with(
+                mock_editor.note,
+                "http://example.com/audio.mp3",
+                "你好",
+                "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+                10,
+            )
+
+    def test_returns_false_when_audio_url_empty(self, mock_editor):
+        """Test that fill_audio_field returns False when audio URL is empty."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào", "audio_url": ""}
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_audio_field(
+            mock_editor,
+            parsed_data,
+            field_mapping,
+            "你好",
+            "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+            10,
+        )
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+    def test_returns_false_when_audio_url_missing(self, mock_editor):
+        """Test that fill_audio_field returns False when audio_url key is missing."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_audio_field(
+            mock_editor,
+            parsed_data,
+            field_mapping,
+            "你好",
+            "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+            10,
+        )
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+    def test_returns_false_when_no_note(self, mock_mw):
+        """Test that fill_audio_field returns False when editor has no note."""
+        editor = MagicMock()
+        editor.note = None
+
+        parsed_data = {
+            "pinyin": "nǐhǎo",
+            "vietnamese": "xin chào",
+            "audio_url": "http://example.com/audio.mp3",
+        }
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        result = fill_audio_field(
+            editor,
+            parsed_data,
+            field_mapping,
+            "你好",
+            "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+            10,
+        )
+
+        assert result is False
+
+    def test_returns_false_and_notifies_when_download_fails(self, mock_editor):
+        """Test that fill_audio_field returns False and shows notification when download fails."""
+        parsed_data = {
+            "pinyin": "nǐhǎo",
+            "vietnamese": "xin chào",
+            "audio_url": "http://example.com/audio.mp3",
+        }
+        field_mapping = {
+            "chinese_field": "Chinese",
+            "pinyin_field": "Pinyin",
+            "vietnamese_field": "Vietnamese",
+            "audio_field": "Audio",
+        }
+
+        with (
+            patch("autodefine_cn_vn.ui_hooks.download_audio") as mock_download_audio,
+            patch("autodefine_cn_vn.ui_hooks.notify") as mock_notify,
+        ):
+            mock_download_audio.side_effect = Exception("Download failed")
+
+            result = fill_audio_field(
+                mock_editor,
+                parsed_data,
+                field_mapping,
+                "你好",
+                "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+                10,
+            )
+
+            assert result is False
+            mock_notify.assert_called_once()
+            assert "Could not download audio" in mock_notify.call_args[0][0]
+            mock_editor.loadNote.assert_not_called()
 
 
 @pytest.fixture

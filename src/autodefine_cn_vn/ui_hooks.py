@@ -81,53 +81,12 @@ def auto_define(editor: "Editor") -> None:
         html_content = fetch_webpage(url, timeout)
         parsed_data = parse_dictionary_content(html_content)
 
-        # Fill pinyin field
-        pinyin = parsed_data.get("pinyin", "")
-        if pinyin:
-            insert_into_field(
-                editor,
-                pinyin,
-                field_mapping["pinyin_field"],
-                overwrite=True,
-            )
+        # Fill fields using helper methods
+        pinyin_filled = fill_pinyin_field(editor, parsed_data, field_mapping)
+        vietnamese_filled = fill_vietnamese_field(editor, parsed_data, field_mapping)
+        fill_audio_field(editor, parsed_data, field_mapping, chinese_text, url_template, timeout)
 
-        # Fill Vietnamese field
-        vietnamese = parsed_data.get("vietnamese", "")
-        if vietnamese:
-            insert_into_field(
-                editor,
-                vietnamese,
-                field_mapping["vietnamese_field"],
-                overwrite=True,
-            )
-
-        # Download and save audio file
-        audio_url = parsed_data.get("audio_url", "")
-        if audio_url and editor.note:
-            try:
-                filename = download_audio(
-                    editor.note,
-                    audio_url,
-                    chinese_text,
-                    url_template,
-                    timeout,
-                )
-                # Insert audio reference into audio field
-                audio_reference = f"[sound:{filename}]"
-                insert_into_field(
-                    editor,
-                    audio_reference,
-                    field_mapping["audio_field"],
-                    overwrite=True,
-                )
-            except Exception as e:
-                # Don't fail the whole operation if audio download fails
-                notify(
-                    f"AutoDefine: Warning - Could not download audio: {str(e)}",
-                    period=3000,
-                )
-
-        if pinyin or vietnamese:
+        if pinyin_filled or vietnamese_filled:
             notify(f"AutoDefine: Successfully filled fields for '{chinese_text}'")
         else:
             notify(
@@ -150,6 +109,107 @@ def auto_define(editor: "Editor") -> None:
             f"AutoDefine: Unexpected error while processing '{chinese_text}': {str(e)}",
             period=5000,
         )
+
+
+def fill_pinyin_field(
+    editor: "Editor", parsed_data: dict[str, str], field_mapping: dict[str, str]
+) -> bool:
+    """Fill pinyin field from parsed data.
+
+    Args:
+        editor: Anki editor instance
+        parsed_data: Dictionary containing parsed pinyin and vietnamese data
+        field_mapping: Dictionary mapping field names to note type fields
+
+    Returns:
+        bool: True if pinyin was filled, False otherwise
+    """
+    pinyin = parsed_data.get("pinyin", "")
+    if pinyin:
+        insert_into_field(
+            editor,
+            pinyin,
+            field_mapping["pinyin_field"],
+            overwrite=True,
+        )
+        return True
+    return False
+
+
+def fill_vietnamese_field(
+    editor: "Editor", parsed_data: dict[str, str], field_mapping: dict[str, str]
+) -> bool:
+    """Fill vietnamese field from parsed data.
+
+    Args:
+        editor: Anki editor instance
+        parsed_data: Dictionary containing parsed pinyin and vietnamese data
+        field_mapping: Dictionary mapping field names to note type fields
+
+    Returns:
+        bool: True if vietnamese was filled, False otherwise
+    """
+    vietnamese = parsed_data.get("vietnamese", "")
+    if vietnamese:
+        insert_into_field(
+            editor,
+            vietnamese,
+            field_mapping["vietnamese_field"],
+            overwrite=True,
+        )
+        return True
+    return False
+
+
+def fill_audio_field(
+    editor: "Editor",
+    parsed_data: dict[str, str],
+    field_mapping: dict[str, str],
+    chinese_text: str,
+    url_template: str,
+    timeout: int,
+) -> bool:
+    """Download audio and fill audio field.
+
+    Args:
+        editor: Anki editor instance
+        parsed_data: Dictionary containing parsed data including audio_url
+        field_mapping: Dictionary mapping field names to note type fields
+        chinese_text: Chinese text used for filename generation
+        url_template: Template URL to extract base URL from
+        timeout: Timeout for audio download in seconds
+
+    Returns:
+        bool: True if audio was filled, False otherwise
+    """
+    audio_url = parsed_data.get("audio_url", "")
+    if not audio_url or not editor.note:
+        return False
+
+    try:
+        filename = download_audio(
+            editor.note,
+            audio_url,
+            chinese_text,
+            url_template,
+            timeout,
+        )
+        # Insert audio reference into audio field
+        audio_reference = f"[sound:{filename}]"
+        insert_into_field(
+            editor,
+            audio_reference,
+            field_mapping["audio_field"],
+            overwrite=True,
+        )
+        return True
+    except Exception as e:
+        # Don't fail the whole operation if audio download fails
+        notify(
+            f"AutoDefine: Warning - Could not download audio: {str(e)}",
+            period=3000,
+        )
+        return False
 
 
 def download_audio(
