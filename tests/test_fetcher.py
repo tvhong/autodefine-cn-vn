@@ -9,6 +9,7 @@ from autodefine_cn_vn.fetcher import (
     fetch_webpage,
     format_url,
     parse_dictionary_content,
+    parse_sample_sentences,
 )
 
 
@@ -298,6 +299,53 @@ class TestParseDictionaryContent:
         assert "các ông" in result["vietnamese"]
         assert result["audio_url"] == "/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
 
+    def test_parse_dictionary_content_with_sentences(self):
+        """Test that parse_dictionary_content includes sample sentences."""
+        from pathlib import Path
+
+        asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
+        html_content = asset_path.read_text(encoding="utf-8")
+
+        result = parse_dictionary_content(html_content)
+
+        assert "sentences" in result
+        assert len(result["sentences"]) == 2
+        assert "<b>你们</b>" in result["sentences"][0]["chinese"]
+        assert "歇一会儿" in result["sentences"][0]["chinese"]
+        assert "các anh nghỉ" in result["sentences"][0]["vietnamese"]
+
+    def test_parse_dictionary_content_no_sentences(self):
+        """Test parsing content with no sample sentences."""
+        html_content = """
+        <span class="thisword"><font color="#93698E">你好</font></span>
+        <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
+        <TD class="tacon" colspan=2><FONT COLOR=#7F0000>[nǐhǎo]</FONT></TD></TR>
+        <TR><TD class="tacon"> </TD><TD class="tacon"><IMG src=img/dict/CB1FF077.png></TD>
+        <TD class="tacon">xin chào</TD></TR></TABLE>
+        """
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == "nǐhǎo"
+        assert result["vietnamese"] == "xin chào"
+        assert result["sentences"] == []
+
+    def test_parse_dictionary_content_missing_chinese_word(self):
+        """Test parsing when Chinese word cannot be extracted."""
+        html_content = """
+        <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
+        <TD class="tacon" colspan=2><FONT COLOR=#7F0000>[nǐhǎo]</FONT></TD></TR>
+        <TR><TD class="tacon"> </TD><TD class="tacon"><IMG src=img/dict/CB1FF077.png></TD>
+        <TD class="tacon">xin chào</TD></TR></TABLE>
+        """
+
+        result = parse_dictionary_content(html_content)
+
+        # Should still parse other fields, but sentences will be empty
+        assert result["pinyin"] == "nǐhǎo"
+        assert result["vietnamese"] == "xin chào"
+        assert result["sentences"] == []
+
 
 class TestFetchAudio:
     """Test suite for audio fetching function."""
@@ -372,3 +420,108 @@ class TestFetchAudio:
 
         with pytest.raises(urllib.error.HTTPError):
             fetch_audio(audio_url, base_url, timeout)
+
+
+class TestParseSampleSentences:
+    """Test suite for parsing sample sentences."""
+
+    def test_parse_sample_sentences_with_two_sentences(self):
+        """Test parsing multiple sample sentences from real HTML."""
+        html_content = """
+        <TR><TD class="tacon" colspan=2> </TD><TD class="tacon"><IMG src=img/dict/72B02D27.png></TD>
+        <TD class="tacon"><FONT color=#FF0000>你们歇一会儿，让我们接着干。</FONT></TD></TR>
+        <TR><TD class="tacon" colspan=3 width=54> </TD>
+        <TD class="tacon"><FONT COLOR=#7F7F7F>các anh nghỉ một lát, để chúng tôi làm tiếp.</FONT></TD></TR>
+        <TR><TD class="tacon" colspan=2> </TD><TD class="tacon"><IMG src=img/dict/72B02D27.png></TD>
+        <TD class="tacon"><FONT color=#FF0000>你们弟兄中间谁是老大?</FONT></TD></TR>
+        <TR><TD class="tacon" colspan=3 width=54> </TD>
+        <TD class="tacon"><FONT COLOR=#7F7F7F>trong anh em các anh, ai là anh cả?</FONT></TD></TR>
+        """
+        chinese_word = "你们"
+
+        result = parse_sample_sentences(html_content, chinese_word)
+
+        assert len(result) == 2
+        assert result[0]["chinese"] == "<b>你们</b>歇一会儿，让我们接着干。"
+        assert result[0]["vietnamese"] == "các anh nghỉ một lát, để chúng tôi làm tiếp."
+        assert result[1]["chinese"] == "<b>你们</b>弟兄中间谁是老大?"
+        assert result[1]["vietnamese"] == "trong anh em các anh, ai là anh cả?"
+
+    def test_parse_sample_sentences_no_sentences(self):
+        """Test parsing when there are no sample sentences."""
+        html_content = """
+        <TABLE><TR><TD class="tacon"><IMG src=img/dict/02C013DD.png></TD>
+        <TD class="tacon" colspan=2><FONT COLOR=#7F0000>[nǐhǎo]</FONT></TD></TR></TABLE>
+        """
+        chinese_word = "你好"
+
+        result = parse_sample_sentences(html_content, chinese_word)
+
+        assert result == []
+
+    def test_parse_sample_sentences_with_highlighting(self):
+        """Test that Chinese word is highlighted with <b> tags."""
+        html_content = """
+        <TR><TD class="tacon" colspan=2> </TD><TD class="tacon"><IMG src=img/dict/72B02D27.png></TD>
+        <TD class="tacon"><FONT color=#FF0000>我爱你。</FONT></TD></TR>
+        <TR><TD class="tacon" colspan=3 width=54> </TD>
+        <TD class="tacon"><FONT COLOR=#7F7F7F>Tôi yêu bạn.</FONT></TD></TR>
+        """
+        chinese_word = "你"
+
+        result = parse_sample_sentences(html_content, chinese_word)
+
+        assert len(result) == 1
+        assert result[0]["chinese"] == "我爱<b>你</b>。"
+        assert result[0]["vietnamese"] == "Tôi yêu bạn."
+
+    def test_parse_sample_sentences_word_appears_multiple_times(self):
+        """Test highlighting when Chinese word appears multiple times in sentence."""
+        html_content = """
+        <TR><TD class="tacon" colspan=2> </TD><TD class="tacon"><IMG src=img/dict/72B02D27.png></TD>
+        <TD class="tacon"><FONT color=#FF0000>你好吗？你呢？</FONT></TD></TR>
+        <TR><TD class="tacon" colspan=3 width=54> </TD>
+        <TD class="tacon"><FONT COLOR=#7F7F7F>Bạn khỏe không? Còn bạn?</FONT></TD></TR>
+        """
+        chinese_word = "你"
+
+        result = parse_sample_sentences(html_content, chinese_word)
+
+        assert len(result) == 1
+        # Both occurrences of 你 should be highlighted
+        assert result[0]["chinese"] == "<b>你</b>好吗？<b>你</b>呢？"
+
+    def test_parse_sample_sentences_with_extra_whitespace(self):
+        """Test parsing sentences with extra whitespace."""
+        html_content = """
+        <TR><TD class="tacon" colspan=2> </TD><TD class="tacon"><IMG src=img/dict/72B02D27.png></TD>
+        <TD class="tacon"><FONT color=#FF0000>  你好  </FONT></TD></TR>
+        <TR><TD class="tacon" colspan=3 width=54> </TD>
+        <TD class="tacon"><FONT COLOR=#7F7F7F>  Xin chào  </FONT></TD></TR>
+        """
+        chinese_word = "你"
+
+        result = parse_sample_sentences(html_content, chinese_word)
+
+        assert len(result) == 1
+        # Whitespace should be stripped
+        assert result[0]["chinese"] == "<b>你</b>好"
+        assert result[0]["vietnamese"] == "Xin chào"
+
+    def test_parse_sample_sentences_from_real_nimen_html(self):
+        """Test parsing sample sentences from real vndic.net HTML (你们 = you plural)."""
+        from pathlib import Path
+
+        asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
+        html_content = asset_path.read_text(encoding="utf-8")
+        chinese_word = "你们"
+
+        result = parse_sample_sentences(html_content, chinese_word)
+
+        assert len(result) == 2
+        assert "<b>你们</b>" in result[0]["chinese"]
+        assert "歇一会儿" in result[0]["chinese"]
+        assert "các anh nghỉ" in result[0]["vietnamese"]
+        assert "<b>你们</b>" in result[1]["chinese"]
+        assert "弟兄中间" in result[1]["chinese"]
+        assert "trong anh em" in result[1]["vietnamese"]

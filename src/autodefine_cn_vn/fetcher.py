@@ -43,15 +43,15 @@ def fetch_webpage(url: str, timeout: int) -> str:
         return content_bytes.decode("utf-8")
 
 
-def parse_dictionary_content(html_content: str) -> dict[str, str]:
-    """Parse pinyin, Vietnamese definition, and audio URL from dictionary HTML content.
+def parse_dictionary_content(html_content: str) -> dict[str, str | list[dict[str, str]]]:
+    """Parse pinyin, Vietnamese definition, audio URL, and sample sentences from dictionary HTML content.
 
     Args:
         html_content: The HTML content to parse
 
     Returns:
-        Dictionary with 'pinyin', 'vietnamese', and 'audio_url' keys.
-        Returns empty strings for missing data.
+        Dictionary with 'pinyin', 'vietnamese', 'audio_url', and 'sentences' keys.
+        Returns empty strings for missing data, empty list for no sentences.
 
     Examples:
         >>> html = '<FONT COLOR=#7F0000>[gōngjīn]</FONT>'
@@ -92,7 +92,94 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
         end_idx = onclick.find("'", start_idx)
         audio_url = onclick[start_idx:end_idx]
 
-    return {"pinyin": pinyin, "vietnamese": vietnamese, "audio_url": audio_url}
+    # Extract Chinese word from <span class="thisword"> tag
+    chinese_word = ""
+    thisword_span = soup.find("span", class_="thisword")
+    if thisword_span:
+        font_tag = thisword_span.find("font")
+        if font_tag:
+            chinese_word = font_tag.get_text(strip=True)
+
+    # Extract sample sentences
+    sentences = []
+    if chinese_word:
+        sentences = parse_sample_sentences(html_content, chinese_word)
+
+    return {
+        "pinyin": pinyin,
+        "vietnamese": vietnamese,
+        "audio_url": audio_url,
+        "sentences": sentences,
+    }
+
+
+def parse_sample_sentences(html_content: str, chinese_word: str) -> list[dict[str, str]]:
+    """Parse sample sentences from dictionary HTML content.
+
+    Args:
+        html_content: The HTML content to parse
+        chinese_word: The Chinese word to highlight in sentences
+
+    Returns:
+        List of dictionaries with 'chinese' and 'vietnamese' keys.
+        Chinese sentences have the target word highlighted with <b> tags.
+        Returns empty list if no sample sentences found.
+
+    Examples:
+        >>> html = '''<TR><TD><IMG src=img/dict/72B02D27.png></TD>
+        ...           <TD><FONT color=#FF0000>我爱你。</FONT></TD></TR>
+        ...           <TR><TD></TD><TD><FONT COLOR=#7F7F7F>Tôi yêu bạn.</FONT></TD></TR>'''
+        >>> result = parse_sample_sentences(html, "你")
+        >>> result[0]['chinese']
+        '我爱<b>你</b>。'
+    """
+    soup = BeautifulSoup(html_content, "html.parser")
+    sentences = []
+
+    # Find all images that mark sample sentences
+    sentence_markers = soup.find_all("img", src=lambda x: bool(x) and "img/dict/72B02D27.png" in x)
+
+    for marker in sentence_markers:
+        # Find the parent TD of the marker
+        marker_td = marker.find_parent("td")
+        if not marker_td:
+            continue
+
+        # Get the next sibling TD which contains the Chinese sentence
+        chinese_td = marker_td.find_next_sibling("td")
+        if not chinese_td:
+            continue
+
+        # Extract Chinese sentence from <FONT color=#FF0000> tag
+        chinese_font = chinese_td.find("font", color=lambda x: bool(x) and x.lower() == "#ff0000")
+        if not chinese_font:
+            continue
+
+        chinese_sentence = chinese_font.get_text(strip=True)
+
+        # Find the next row (TR) which contains the Vietnamese translation
+        current_tr = marker.find_parent("tr")
+        if not current_tr:
+            continue
+
+        next_tr = current_tr.find_next_sibling("tr")
+        vietnamese_sentence = ""
+
+        if next_tr:
+            # Find <FONT COLOR=#7F7F7F> tag with Vietnamese translation
+            vietnamese_font = next_tr.find(
+                "font", color=lambda x: bool(x) and x.lower() == "#7f7f7f"
+            )
+            if vietnamese_font:
+                vietnamese_sentence = vietnamese_font.get_text(strip=True)
+
+        # Highlight the Chinese word in the sentence (all occurrences)
+        if chinese_word in chinese_sentence:
+            chinese_sentence = chinese_sentence.replace(chinese_word, f"<b>{chinese_word}</b>")
+
+        sentences.append({"chinese": chinese_sentence, "vietnamese": vietnamese_sentence})
+
+    return sentences
 
 
 def fetch_audio(audio_url: str, base_url: str, timeout: int) -> bytes:
