@@ -31,6 +31,13 @@ class ApiSettings:
     max_retries: int
 
 
+DEFAULT_API_SETTINGS = ApiSettings(
+    source="http://2.vndic.net/index.php?word={}&dict=cn_vi",
+    timeout_seconds=10,
+    max_retries=3,
+)
+
+
 @dataclass(frozen=True)
 class Config:
     """Complete addon configuration."""
@@ -100,5 +107,5 @@ class ConfigManager:
             version=config_dict["version"],
             field_mapping=FieldMapping(**config_dict["field_mapping"]),
             shortcuts=Shortcuts(**config_dict["shortcuts"]),
-            api_settings=ApiSettings(**config_dict["api_settings"]),
+            api_settings=DEFAULT_API_SETTINGS,
         )
