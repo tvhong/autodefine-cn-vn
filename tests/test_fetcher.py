@@ -310,7 +310,7 @@ class TestParseDictionaryContent:
 
         assert "sentences" in result
         assert len(result["sentences"]) == 2
-        assert "<b>你们</b>" in result["sentences"][0]["chinese"]
+        assert "你们" in result["sentences"][0]["chinese"]
         assert "歇一会儿" in result["sentences"][0]["chinese"]
         assert "các anh nghỉ" in result["sentences"][0]["vietnamese"]
 
@@ -442,9 +442,9 @@ class TestParseSampleSentences:
         result = parse_sample_sentences(html_content, chinese_word)
 
         assert len(result) == 2
-        assert result[0]["chinese"] == "<b>你们</b>歇一会儿，让我们接着干。"
+        assert result[0]["chinese"] == "你们歇一会儿，让我们接着干。"
         assert result[0]["vietnamese"] == "các anh nghỉ một lát, để chúng tôi làm tiếp."
-        assert result[1]["chinese"] == "<b>你们</b>弟兄中间谁是老大?"
+        assert result[1]["chinese"] == "你们弟兄中间谁是老大?"
         assert result[1]["vietnamese"] == "trong anh em các anh, ai là anh cả?"
 
     def test_parse_sample_sentences_no_sentences(self):
@@ -459,8 +459,8 @@ class TestParseSampleSentences:
 
         assert result == []
 
-    def test_parse_sample_sentences_with_highlighting(self):
-        """Test that Chinese word is highlighted with <b> tags."""
+    def test_parse_sample_sentences_basic(self):
+        """Test parsing a basic sample sentence."""
         html_content = """
         <TR><TD class="tacon" colspan=2> </TD><TD class="tacon"><IMG src=img/dict/72B02D27.png></TD>
         <TD class="tacon"><FONT color=#FF0000>我爱你。</FONT></TD></TR>
@@ -472,11 +472,11 @@ class TestParseSampleSentences:
         result = parse_sample_sentences(html_content, chinese_word)
 
         assert len(result) == 1
-        assert result[0]["chinese"] == "我爱<b>你</b>。"
+        assert result[0]["chinese"] == "我爱你。"
         assert result[0]["vietnamese"] == "Tôi yêu bạn."
 
     def test_parse_sample_sentences_word_appears_multiple_times(self):
-        """Test highlighting when Chinese word appears multiple times in sentence."""
+        """Test parsing when Chinese word appears multiple times in sentence."""
         html_content = """
         <TR><TD class="tacon" colspan=2> </TD><TD class="tacon"><IMG src=img/dict/72B02D27.png></TD>
         <TD class="tacon"><FONT color=#FF0000>你好吗？你呢？</FONT></TD></TR>
@@ -488,8 +488,7 @@ class TestParseSampleSentences:
         result = parse_sample_sentences(html_content, chinese_word)
 
         assert len(result) == 1
-        # Both occurrences of 你 should be highlighted
-        assert result[0]["chinese"] == "<b>你</b>好吗？<b>你</b>呢？"
+        assert result[0]["chinese"] == "你好吗？你呢？"
 
     def test_parse_sample_sentences_with_extra_whitespace(self):
         """Test parsing sentences with extra whitespace."""
@@ -505,7 +504,7 @@ class TestParseSampleSentences:
 
         assert len(result) == 1
         # Whitespace should be stripped
-        assert result[0]["chinese"] == "<b>你</b>好"
+        assert result[0]["chinese"] == "你好"
         assert result[0]["vietnamese"] == "Xin chào"
 
     def test_parse_sample_sentences_from_real_nimen_html(self):
@@ -519,9 +518,9 @@ class TestParseSampleSentences:
         result = parse_sample_sentences(html_content, chinese_word)
 
         assert len(result) == 2
-        assert "<b>你们</b>" in result[0]["chinese"]
+        assert "你们" in result[0]["chinese"]
         assert "歇一会儿" in result[0]["chinese"]
         assert "các anh nghỉ" in result[0]["vietnamese"]
-        assert "<b>你们</b>" in result[1]["chinese"]
+        assert "你们" in result[1]["chinese"]
         assert "弟兄中间" in result[1]["chinese"]
         assert "trong anh em" in result[1]["vietnamese"]

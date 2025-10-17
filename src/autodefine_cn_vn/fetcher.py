@@ -118,11 +118,10 @@ def parse_sample_sentences(html_content: str, chinese_word: str) -> list[dict[st
 
     Args:
         html_content: The HTML content to parse
-        chinese_word: The Chinese word to highlight in sentences
+        chinese_word: The Chinese word being looked up (currently unused)
 
     Returns:
         List of dictionaries with 'chinese' and 'vietnamese' keys.
-        Chinese sentences have the target word highlighted with <b> tags.
         Returns empty list if no sample sentences found.
 
     Examples:
@@ -131,7 +130,7 @@ def parse_sample_sentences(html_content: str, chinese_word: str) -> list[dict[st
         ...           <TR><TD></TD><TD><FONT COLOR=#7F7F7F>Tôi yêu bạn.</FONT></TD></TR>'''
         >>> result = parse_sample_sentences(html, "你")
         >>> result[0]['chinese']
-        '我爱<b>你</b>。'
+        '我爱你。'
     """
     soup = BeautifulSoup(html_content, "html.parser")
     sentences = []
@@ -172,10 +171,6 @@ def parse_sample_sentences(html_content: str, chinese_word: str) -> list[dict[st
             )
             if vietnamese_font:
                 vietnamese_sentence = vietnamese_font.get_text(strip=True)
-
-        # Highlight the Chinese word in the sentence (all occurrences)
-        if chinese_word in chinese_sentence:
-            chinese_sentence = chinese_sentence.replace(chinese_word, f"<b>{chinese_word}</b>")
 
         sentences.append({"chinese": chinese_sentence, "vietnamese": vietnamese_sentence})
 
