@@ -35,6 +35,7 @@ class ApiSettings:
 class Config:
     """Complete addon configuration."""
 
+    version: str
     field_mapping: FieldMapping
     shortcuts: Shortcuts
     api_settings: ApiSettings
@@ -96,6 +97,7 @@ class ConfigManager:
             raise ValueError("Failed to load configuration for AutoDefine CN-VN addon.")
 
         return Config(
+            version=config_dict["version"],
             field_mapping=FieldMapping(**config_dict["field_mapping"]),
             shortcuts=Shortcuts(**config_dict["shortcuts"]),
             api_settings=ApiSettings(**config_dict["api_settings"]),

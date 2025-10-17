@@ -12,6 +12,7 @@ def mock_mw():
     """Mock Anki's main window."""
     mw = MagicMock()
     mw.addonManager.getConfig.return_value = {
+        "version": "v1",
         "field_mapping": {
             "chinese_field": "Chinese",
             "pinyin_field": "Pinyin",
@@ -77,6 +78,7 @@ class TestConfigManager:
 
         # Simulate external config change
         mock_mw.addonManager.getConfig.return_value = {
+            "version": "v1",
             "field_mapping": {
                 "chinese_field": "UpdatedChinese",
                 "pinyin_field": "Pinyin",
