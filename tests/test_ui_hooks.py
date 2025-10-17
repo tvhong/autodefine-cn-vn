@@ -1,5 +1,6 @@
 """Tests for UI hooks module."""
 
+from types import MappingProxyType
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -15,13 +16,15 @@ from autodefine_cn_vn.ui_hooks import (
     setup_editor_buttons,
 )
 
-# Constant field mapping used across tests
-FIELD_MAPPING = {
-    "chinese_field": "Chinese",
-    "pinyin_field": "Pinyin",
-    "vietnamese_field": "Vietnamese",
-    "audio_field": "Audio",
-}
+# Constant field mapping used across tests (immutable)
+FIELD_MAPPING = MappingProxyType(
+    {
+        "chinese_field": "Chinese",
+        "pinyin_field": "Pinyin",
+        "vietnamese_field": "Vietnamese",
+        "audio_field": "Audio",
+    }
+)
 
 
 @pytest.fixture
