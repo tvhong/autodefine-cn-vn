@@ -1,5 +1,7 @@
 """Tests for fetcher module."""
 
+import urllib.error
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -98,8 +100,6 @@ class TestFetchWebpage:
     @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
     def test_fetch_webpage_timeout_error(self, mock_urlopen):
         """Test handling of timeout errors."""
-        import urllib.error
-
         mock_urlopen.side_effect = urllib.error.URLError("Timeout")
 
         url = "http://2.vndic.net/index.php?word=你好&dict=cn_vi"
@@ -111,8 +111,6 @@ class TestFetchWebpage:
     @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
     def test_fetch_webpage_http_error(self, mock_urlopen):
         """Test handling of HTTP errors (404, 500, etc.)."""
-        import urllib.error
-
         mock_urlopen.side_effect = urllib.error.HTTPError(
             url="http://test.com", code=404, msg="Not Found", hdrs={}, fp=None
         )
@@ -225,8 +223,6 @@ class TestParseDictionaryContent:
     def test_parse_real_dictionary_page(self):
         """Test parsing a real dictionary page HTML (公斤 = kilogram)."""
         # This is the actual HTML structure from vndic.net for the word 公斤
-        from pathlib import Path
-
         asset_path = Path(__file__).parent / "assets" / "vndic_net_gongjin.html"
         html_content = asset_path.read_text(encoding="utf-8")
 
@@ -239,8 +235,6 @@ class TestParseDictionaryContent:
     def test_parse_real_dictionary_page_nimen(self):
         """Test parsing a real dictionary page HTML (你们 = you plural)."""
         # This is the actual HTML structure from vndic.net for the word 你们
-        from pathlib import Path
-
         asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
         html_content = asset_path.read_text(encoding="utf-8")
 
@@ -254,8 +248,6 @@ class TestParseDictionaryContent:
     def test_parse_real_dictionary_page_ni(self):
         """Test parsing a real dictionary page HTML (你 = you)."""
         # This is the actual HTML structure from vndic.net for the word 你
-        from pathlib import Path
-
         asset_path = Path(__file__).parent / "assets" / "vndic_net_ni.html"
         html_content = asset_path.read_text(encoding="utf-8")
 
@@ -288,8 +280,6 @@ class TestParseDictionaryContent:
 
     def test_parse_real_dictionary_page_with_audio(self):
         """Test parsing a real dictionary page HTML with audio URL (你们 = you plural)."""
-        from pathlib import Path
-
         asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
         html_content = asset_path.read_text(encoding="utf-8")
 
@@ -301,8 +291,6 @@ class TestParseDictionaryContent:
 
     def test_parse_dictionary_content_with_sentences(self):
         """Test that parse_dictionary_content includes sample sentences."""
-        from pathlib import Path
-
         asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
         html_content = asset_path.read_text(encoding="utf-8")
 
@@ -394,8 +382,6 @@ class TestFetchAudio:
     @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
     def test_fetch_audio_timeout_error(self, mock_urlopen):
         """Test handling of timeout errors during audio fetch."""
-        import urllib.error
-
         mock_urlopen.side_effect = urllib.error.URLError("Timeout")
 
         audio_url = "/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
@@ -408,8 +394,6 @@ class TestFetchAudio:
     @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
     def test_fetch_audio_http_error(self, mock_urlopen):
         """Test handling of HTTP errors during audio fetch."""
-        import urllib.error
-
         mock_urlopen.side_effect = urllib.error.HTTPError(
             url="http://test.com", code=404, msg="Not Found", hdrs={}, fp=None
         )
@@ -504,8 +488,6 @@ class TestParseSampleSentences:
 
     def test_parse_sample_sentences_from_real_nimen_html(self):
         """Test parsing sample sentences from real vndic.net HTML (你们 = you plural)."""
-        from pathlib import Path
-
         asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
         html_content = asset_path.read_text(encoding="utf-8")
 

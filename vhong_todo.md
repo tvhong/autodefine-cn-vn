@@ -14,9 +14,15 @@
 
 ### 0.2.x: Support sample sentences
 
-- [ ] Add configuration field
-- [ ] Parse sample sentences
+- [x] Parse sample sentences
 - [ ] Add multiple sentences to the fields, highlighting the chinese word
+
+### 0.2.x: Clean up
+
+- [ ] Upgrade version of anki and aqt to 25.9.x
+- [ ] Allow empty "field" for optional configs such as audio and sample sentences
+- [ ] Fix shortcut
+- [ ] Separate fetcher and parser
 
 ### 0.2.x: Support multiple definitions
 
@@ -27,9 +33,8 @@
 
 - [ ] Have a nice icon
 - [ ] Support default tags such as "language::chinese" as well
-- [ ] Make this more generic for different types of translators
+- [ ] Make this more generic for different dictionary_sources
 - [ ] Support multiple card types
-- [ ] Fix shortcut
 
 ### Won't do
 
