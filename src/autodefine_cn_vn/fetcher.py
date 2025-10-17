@@ -2,8 +2,25 @@
 
 import urllib.parse
 import urllib.request
+from typing import TypedDict
 
 from bs4 import BeautifulSoup
+
+
+class SampleSentence(TypedDict):
+    """Structure for a sample sentence with Chinese and Vietnamese translations."""
+
+    chinese: str
+    vietnamese: str
+
+
+class DictionaryContent(TypedDict):
+    """Structure for parsed dictionary content."""
+
+    pinyin: str
+    vietnamese: str
+    audio_url: str
+    sentences: list[SampleSentence]
 
 
 def format_url(url_template: str, chinese_word: str) -> str:
@@ -43,7 +60,7 @@ def fetch_webpage(url: str, timeout: int) -> str:
         return content_bytes.decode("utf-8")
 
 
-def parse_dictionary_content(html_content: str) -> dict[str, str | list[dict[str, str]]]:
+def parse_dictionary_content(html_content: str) -> DictionaryContent:
     """Parse pinyin, Vietnamese definition, audio URL, and sample sentences from dictionary HTML content.
 
     Args:
@@ -103,7 +120,7 @@ def parse_dictionary_content(html_content: str) -> dict[str, str | list[dict[str
     }
 
 
-def parse_sample_sentences(html_content: str) -> list[dict[str, str]]:
+def parse_sample_sentences(html_content: str) -> list[SampleSentence]:
     """Parse sample sentences from dictionary HTML content.
 
     Args:
