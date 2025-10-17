@@ -1,8 +1,43 @@
 """Configuration manager for AutoDefine Chinese-Vietnamese addon."""
 
-from typing import cast
+from dataclasses import dataclass
 
 from aqt import mw
+
+
+@dataclass(frozen=True)
+class FieldMapping:
+    """Field name mappings for Anki note fields."""
+
+    chinese_field: str
+    pinyin_field: str
+    vietnamese_field: str
+    audio_field: str
+
+
+@dataclass(frozen=True)
+class Shortcuts:
+    """Keyboard shortcut configurations."""
+
+    auto_define_shortcut: str
+
+
+@dataclass(frozen=True)
+class ApiSettings:
+    """API settings for fetching definitions."""
+
+    source: str
+    timeout_seconds: int
+    max_retries: int
+
+
+@dataclass(frozen=True)
+class Config:
+    """Complete addon configuration."""
+
+    field_mapping: FieldMapping
+    shortcuts: Shortcuts
+    api_settings: ApiSettings
 
 
 class ConfigManager:
