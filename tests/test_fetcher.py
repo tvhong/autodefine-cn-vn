@@ -4,7 +4,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from autodefine_cn_vn.fetcher import fetch_webpage, format_url, parse_dictionary_content
+from autodefine_cn_vn.fetcher import (
+    fetch_audio,
+    fetch_webpage,
+    format_url,
+    parse_dictionary_content,
+)
 
 
 class TestFormatUrl:
@@ -154,6 +159,7 @@ class TestParseDictionaryContent:
             result["vietnamese"]
             == "ki-lô-gam。国际公制重量或质量主单位，一公斤等于一千克，合二市斤。"
         )
+        assert result["audio_url"] == ""
 
     def test_parse_content_with_extra_whitespace(self):
         """Test parsing content with extra whitespace."""
@@ -258,3 +264,111 @@ class TestParseDictionaryContent:
         assert "anh" in result["vietnamese"]
         assert "chị" in result["vietnamese"]
         assert "称对方(一个人)" in result["vietnamese"]
+
+    def test_parse_audio_url_from_html(self):
+        """Test parsing audio URL from soundManager.play() call."""
+        html_content = """
+        <span onclick="soundManager.play('/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&');" style="cursor:pointer;">
+            <img src="/images/loa.png" border="0"/>
+        </span>
+        """
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["audio_url"] == "/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
+
+    def test_parse_audio_url_missing(self):
+        """Test parsing when audio URL is missing."""
+        html_content = "<html><body>No audio here</body></html>"
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["audio_url"] == ""
+
+    def test_parse_real_dictionary_page_with_audio(self):
+        """Test parsing a real dictionary page HTML with audio URL (你们 = you plural)."""
+        from pathlib import Path
+
+        asset_path = Path(__file__).parent / "assets" / "vndic_net_nimen.html"
+        html_content = asset_path.read_text(encoding="utf-8")
+
+        result = parse_dictionary_content(html_content)
+
+        assert result["pinyin"] == "nǐ·men"
+        assert "các ông" in result["vietnamese"]
+        assert result["audio_url"] == "/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
+
+
+class TestFetchAudio:
+    """Test suite for audio fetching function."""
+
+    @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
+    def test_fetch_audio_success(self, mock_urlopen):
+        """Test successful audio fetching."""
+        # Mock the response with fake MP3 data
+        mock_audio_data = b"\xff\xfb\x90\x00"  # Fake MP3 header
+        mock_response = MagicMock()
+        mock_response.read.return_value = mock_audio_data
+        mock_response.__enter__.return_value = mock_response
+        mock_urlopen.return_value = mock_response
+
+        audio_url = "/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
+        base_url = "http://2.vndic.net"
+        timeout = 10
+
+        result = fetch_audio(audio_url, base_url, timeout)
+
+        assert result == mock_audio_data
+        # Verify full URL was constructed correctly
+        call_args = mock_urlopen.call_args
+        assert call_args[0][0] == "http://2.vndic.net/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
+
+    @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
+    def test_fetch_audio_with_absolute_url(self, mock_urlopen):
+        """Test fetching audio when URL is already absolute."""
+        mock_audio_data = b"\xff\xfb\x90\x00"
+        mock_response = MagicMock()
+        mock_response.read.return_value = mock_audio_data
+        mock_response.__enter__.return_value = mock_response
+        mock_urlopen.return_value = mock_response
+
+        audio_url = "http://example.com/audio.mp3"
+        base_url = "http://2.vndic.net"
+        timeout = 10
+
+        result = fetch_audio(audio_url, base_url, timeout)
+
+        assert result == mock_audio_data
+        # Verify absolute URL was used as-is
+        call_args = mock_urlopen.call_args
+        assert call_args[0][0] == "http://example.com/audio.mp3"
+
+    @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
+    def test_fetch_audio_timeout_error(self, mock_urlopen):
+        """Test handling of timeout errors during audio fetch."""
+        import urllib.error
+
+        mock_urlopen.side_effect = urllib.error.URLError("Timeout")
+
+        audio_url = "/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
+        base_url = "http://2.vndic.net"
+        timeout = 10
+
+        with pytest.raises(urllib.error.URLError):
+            fetch_audio(audio_url, base_url, timeout)
+
+    @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
+    def test_fetch_audio_http_error(self, mock_urlopen):
+        """Test handling of HTTP errors during audio fetch."""
+        import urllib.error
+
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="http://test.com", code=404, msg="Not Found", hdrs={}, fp=None
+        )
+
+        audio_url = "/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
+        base_url = "http://2.vndic.net"
+        timeout = 10
+
+        with pytest.raises(urllib.error.HTTPError):
+            fetch_audio(audio_url, base_url, timeout)

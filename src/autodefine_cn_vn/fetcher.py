@@ -45,13 +45,13 @@ def fetch_webpage(url: str, timeout: int) -> str:
 
 
 def parse_dictionary_content(html_content: str) -> dict[str, str]:
-    """Parse pinyin and Vietnamese definition from dictionary HTML content.
+    """Parse pinyin, Vietnamese definition, and audio URL from dictionary HTML content.
 
     Args:
         html_content: The HTML content to parse
 
     Returns:
-        Dictionary with 'pinyin' and 'vietnamese' keys.
+        Dictionary with 'pinyin', 'vietnamese', and 'audio_url' keys.
         Returns empty strings for missing data.
 
     Examples:
@@ -84,4 +84,38 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
             if next_td:
                 vietnamese = next_td.get_text(strip=True)
 
-    return {"pinyin": pinyin, "vietnamese": vietnamese}
+    # Extract audio URL from soundManager.play() call
+    audio_url = ""
+    audio_span = soup.find("span", onclick=lambda x: x and "soundManager.play" in x)
+    if audio_span:
+        onclick = audio_span.get("onclick", "")
+        # Extract URL from soundManager.play('/mp3.php?...')
+        if "soundManager.play(" in onclick:
+            start_idx = onclick.find("'") + 1
+            end_idx = onclick.find("'", start_idx)
+            if start_idx > 0 and end_idx > start_idx:
+                audio_url = onclick[start_idx:end_idx]
+
+    return {"pinyin": pinyin, "vietnamese": vietnamese, "audio_url": audio_url}
+
+
+def fetch_audio(audio_url: str, base_url: str, timeout: int) -> bytes:
+    """Fetch audio file from the given URL.
+
+    Args:
+        audio_url: Relative audio URL path (e.g., '/mp3.php?id=...')
+        base_url: Base URL of the dictionary site (e.g., 'http://2.vndic.net')
+        timeout: Request timeout in seconds
+
+    Returns:
+        The audio file content as bytes
+
+    Raises:
+        urllib.error.URLError: If there's a network error or timeout
+        urllib.error.HTTPError: If the server returns an HTTP error (404, 500, etc.)
+    """
+    # Construct full URL if audio_url is relative
+    full_url = base_url.rstrip("/") + audio_url if audio_url.startswith("/") else audio_url
+
+    with urllib.request.urlopen(full_url, timeout=timeout) as response:
+        return response.read()

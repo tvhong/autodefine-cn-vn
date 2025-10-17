@@ -2,9 +2,9 @@
 
 ## 0.2.0: Support audio and sample sentences
 
-- [ ] Download the audio into appropriate places
+- [x] Download the audio into appropriate places
   - Example: http://2.vndic.net/index.php?word=%E4%BD%A0%E4%BB%AC&dict=cn_vi
-- [ ] Link it to the card
+- [x] Link it to the card
 
 ### 0.2.1: Clean up
 
