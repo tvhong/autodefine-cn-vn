@@ -1,6 +1,5 @@
 """Functions for fetching and parsing Chinese-Vietnamese dictionary content."""
 
-import urllib.error
 import urllib.parse
 import urllib.request
 
