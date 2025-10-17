@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is an Anki addon (v0.1.2) that automatically populates Chinese vocabulary cards with Vietnamese translations and pinyin pronunciations. The addon integrates with Anki's card editor through hooks and provides an editor button with keyboard shortcut (Ctrl+Alt+D) for manual triggering.
 
 **Key Features:**
+
 - Fetches translations from http://2.vndic.net/index.php?word={}&dict=cn_vi
 - Parses pinyin pronunciation and Vietnamese definitions using BeautifulSoup4
 - Configurable field mapping for different note types
@@ -79,21 +80,25 @@ src/autodefine_cn_vn/
 ### Core Modules
 
 **`__init__.py`** - Entry point that Anki loads when the addon is activated
+
 - Registers `profileLoaded` hook to initialize the addon
 - Sets up "AutoDefine CN-VN Settings" menu in Tools menu
 - Adds vendor directory to sys.path for bundled dependencies
 
 **`config_manager.py`** - Configuration management using Anki's config API
+
 - `ConfigManager` class with methods: `get_field_mapping()`, `get_shortcuts()`, `get_api_settings()`
 - Loads configuration from Anki's addon manager
 - Supports config reloading
 
 **`fetcher.py`** - Web scraping and parsing
+
 - `format_url(url_template, chinese_word)`: Formats URL with Chinese word
 - `fetch_webpage(url, timeout)`: Fetches HTML content from vndic.net
 - `parse_dictionary_content(html_content)`: Extracts pinyin and Vietnamese definitions using BeautifulSoup4
 
 **`ui_hooks.py`** - Anki editor integration
+
 - `init_ui_hooks()`: Registers editor button setup hook
 - `setup_editor_buttons(buttons, editor)`: Adds "自動" button to editor toolbar
 - `auto_define(editor)`: Main logic to fetch and populate fields
@@ -101,6 +106,7 @@ src/autodefine_cn_vn/
 - `insert_into_field(editor, text, field_name, overwrite)`: Updates note fields
 
 **`utils.py`** - Anki note utilities
+
 - `notify(message, period)`: Shows tooltip and prints to stdout
 - `get_field(note, field_name)`: Gets field value by name
 - `set_field(note, field, value)`: Sets field value by name
@@ -128,11 +134,6 @@ src/autodefine_cn_vn/
   },
   "shortcuts": {
     "auto_define_shortcut": "Ctrl+Alt+D"
-  },
-  "api_settings": {
-    "source": "http://2.vndic.net/index.php?word={}&dict=cn_vi",
-    "timeout_seconds": 10,
-    "max_retries": 3
   }
 }
 ```
@@ -163,17 +164,20 @@ Users can customize these settings through Anki's Tools > Add-ons > Config inter
 ### Dependency Vendoring
 
 **Why vendor dependencies?**
+
 - Anki runs in an isolated Python environment
 - Users may not have pip access or technical knowledge to install dependencies
 - Ensures the addon works out-of-the-box after installation
 
 **Build process** (automated by `scripts/build.py`):
+
 1. Copies addon Python files from `src/autodefine_cn_vn/`
 2. Installs beautifulsoup4, soupsieve, and typing-extensions to `vendor/` directory using exact versions from `uv.lock`
 3. Cleans up `.dist-info`, `.egg-info`, and `__pycache__` files
 4. Packages everything into `.ankiaddon` file (zip format)
 
 **Vendor path setup** (in `__init__.py`):
+
 ```python
 vendor_dir = Path(__file__).parent / "vendor"
 if vendor_dir.exists() and str(vendor_dir) not in sys.path:
@@ -217,16 +221,22 @@ if vendor_dir.exists() and str(vendor_dir) not in sys.path:
 ## Translation Data Source
 
 The addon fetches Vietnamese translations from: `http://2.vndic.net/index.php?word={}&dict=cn_vi`
+There are examples in `tests/assets/`
 
 **Parsing strategy:**
+
 1. **Pinyin**: Extracted from `<FONT COLOR=#7F0000>` tag, stripped of square brackets
 2. **Vietnamese definition**: Finds `<img src="...CB1FF077.png">` marker, then extracts text from next `<td>` sibling
 
 **Example HTML structure:**
+
 ```html
-<FONT COLOR=#7F0000>[nǐmen]</FONT>  <!-- Pinyin -->
-<img src="img/dict/CB1FF077.png">  <!-- Marker -->
-<td>các bạn, các anh, các chị</td>  <!-- Vietnamese -->
+<font color="#7F0000">[nǐmen]</font>
+<!-- Pinyin -->
+<img src="img/dict/CB1FF077.png" />
+<!-- Marker -->
+<td>các bạn, các anh, các chị</td>
+<!-- Vietnamese -->
 ```
 
 ## Build and Release Process
@@ -238,6 +248,7 @@ just build  # Creates dist/autodefine_cn_vn-{version}.ankiaddon
 ```
 
 The build script (`scripts/build.py`):
+
 1. Reads version from `pyproject.toml`
 2. Creates temporary build directory
 3. Copies Python files and config.json
@@ -254,6 +265,7 @@ just release-major    # 0.1.2 -> 1.0.0
 ```
 
 The release script (`scripts/release.py`):
+
 1. Validates version format
 2. Updates `pyproject.toml`
 3. Updates `manifest.json` (if exists)
@@ -285,6 +297,7 @@ The release script (`scripts/release.py`):
 ```
 
 **Tips:**
+
 - Create a "Test" profile for safer experimentation
 - Run from terminal to see stdout/stderr output (useful for debugging with `print()`)
 - The addon will reload automatically when you restart Anki
