@@ -89,12 +89,9 @@ def parse_dictionary_content(html_content: str) -> dict[str, str]:
     audio_span = soup.find("span", onclick=lambda x: x and "soundManager.play" in x)
     if audio_span:
         onclick = audio_span.get("onclick", "")
-        # Extract URL from soundManager.play('/mp3.php?...')
-        if "soundManager.play(" in onclick:
-            start_idx = onclick.find("'") + 1
-            end_idx = onclick.find("'", start_idx)
-            if start_idx > 0 and end_idx > start_idx:
-                audio_url = onclick[start_idx:end_idx]
+        start_idx = onclick.find("'") + 1
+        end_idx = onclick.find("'", start_idx)
+        audio_url = onclick[start_idx:end_idx]
 
     return {"pinyin": pinyin, "vietnamese": vietnamese, "audio_url": audio_url}
 
