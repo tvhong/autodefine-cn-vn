@@ -13,6 +13,7 @@ class FieldMapping:
     pinyin_field: str
     vietnamese_field: str
     audio_field: str
+    sentence_field: str
 
 
 @dataclass(frozen=True)

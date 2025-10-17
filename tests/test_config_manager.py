@@ -18,6 +18,7 @@ def mock_mw():
             "pinyin_field": "Pinyin",
             "vietnamese_field": "Vietnamese",
             "audio_field": "Audio",
+            "sentence_field": "Sentence",
         },
         "shortcuts": {"auto_define_shortcut": "Ctrl+Alt+D"},
         "api_settings": {
@@ -54,6 +55,7 @@ class TestConfigManager:
         assert field_mapping.pinyin_field == "Pinyin"
         assert field_mapping.vietnamese_field == "Vietnamese"
         assert field_mapping.audio_field == "Audio"
+        assert field_mapping.sentence_field == "Sentence"
 
     def test_get_shortcuts_returns_correct_values(self, mock_mw):
         """Test that get_shortcuts returns the correct shortcuts."""
@@ -84,6 +86,7 @@ class TestConfigManager:
                 "pinyin_field": "Pinyin",
                 "vietnamese_field": "Vietnamese",
                 "audio_field": "Audio",
+                "sentence_field": "Sentence",
             },
             "shortcuts": {"auto_define_shortcut": "Ctrl+Alt+D"},
             "api_settings": {

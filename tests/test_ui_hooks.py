@@ -24,6 +24,7 @@ def get_field_mapping() -> FieldMapping:
         pinyin_field="Pinyin",
         vietnamese_field="Vietnamese",
         audio_field="Audio",
+        sentence_field="Sentence",
     )
 
 
@@ -38,6 +39,7 @@ def mock_mw():
             "pinyin_field": "Pinyin",
             "vietnamese_field": "Vietnamese",
             "audio_field": "Audio",
+            "sentence_field": "Sentence",
         },
         "shortcuts": {"auto_define_shortcut": "Ctrl+Alt+D"},
         "api_settings": {
@@ -54,6 +56,7 @@ def mock_mw():
         "Pinyin": (1, MagicMock()),
         "Vietnamese": (2, MagicMock()),
         "Audio": (3, MagicMock()),
+        "Sentence": (4, MagicMock()),
     }
 
     with patch("autodefine_cn_vn.config_manager.mw", mw), patch("autodefine_cn_vn.utils.mw", mw):
@@ -67,7 +70,7 @@ def mock_editor(mock_mw):
 
     # Mock note with fields
     note = MagicMock()
-    note.fields = ["你好", "", "", ""]  # Chinese, Pinyin, Vietnamese, Audio
+    note.fields = ["你好", "", "", "", ""]  # Chinese, Pinyin, Vietnamese, Audio, Sentence
     editor.note = note
 
     # Mock editor methods

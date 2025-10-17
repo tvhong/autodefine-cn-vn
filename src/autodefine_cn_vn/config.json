@@ -4,7 +4,8 @@
     "chinese_field": "Chinese",
     "pinyin_field": "Pinyin",
     "vietnamese_field": "Vietnamese",
-    "audio_field": "Audio"
+    "audio_field": "Audio",
+    "sentence_field": "Sentence"
   },
   "shortcuts": {
     "auto_define_shortcut": "Ctrl+Alt+D"

@@ -15,7 +15,8 @@
 ### 0.2.x: Support sample sentences
 
 - [x] Parse sample sentences
-- [ ] Add multiple sentences to the fields, highlighting the chinese word
+- [ ] Add one sample sentence to the card
+- [ ] Highlighting the chinese word
 
 ### 0.2.x: Clean up
 
