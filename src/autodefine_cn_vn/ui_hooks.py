@@ -2,6 +2,7 @@
 
 import urllib.error
 from typing import TYPE_CHECKING
+from urllib.parse import urlparse
 
 from anki.hooks import addHook
 from anki.notes import Note
@@ -104,22 +105,13 @@ def auto_define(editor: "Editor") -> None:
         audio_url = parsed_data.get("audio_url", "")
         if audio_url and editor.note:
             try:
-                # Extract base URL from the source URL
-                from urllib.parse import urlparse
-
-                parsed_url = urlparse(url_template)
-                base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-
-                # Download audio file
-                audio_data = fetch_audio(audio_url, base_url, timeout)
-
-                # Generate filename from Chinese text
-                # Use sanitized filename with .mp3 extension
-                safe_filename = f"autodefine_cn_vn_{chinese_text}.mp3"
-
-                # Write audio to Anki's media collection
-                filename = editor.note.col.media.write_data(safe_filename, audio_data)
-
+                filename = download_audio(
+                    editor.note,
+                    audio_url,
+                    chinese_text,
+                    url_template,
+                    timeout,
+                )
                 # Insert audio reference into audio field
                 audio_reference = f"[sound:{filename}]"
                 insert_into_field(
@@ -158,6 +150,45 @@ def auto_define(editor: "Editor") -> None:
             f"AutoDefine: Unexpected error while processing '{chinese_text}': {str(e)}",
             period=5000,
         )
+
+
+def download_audio(
+    note: Note,
+    audio_url: str,
+    chinese_text: str,
+    url_template: str,
+    timeout: int,
+) -> str:
+    """Download audio file and save to Anki's media collection.
+
+    Args:
+        note: Anki note instance
+        audio_url: URL of the audio file to download
+        chinese_text: Chinese text used for filename generation
+        url_template: Template URL to extract base URL from
+        timeout: Timeout for audio download in seconds
+
+    Returns:
+        str: Filename of the saved audio file
+
+    Raises:
+        Exception: If audio download or save fails
+    """
+    # Extract base URL from the source URL
+    parsed_url = urlparse(url_template)
+    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+
+    # Download audio file
+    audio_data = fetch_audio(audio_url, base_url, timeout)
+
+    # Generate filename from Chinese text
+    # Use sanitized filename with .mp3 extension
+    safe_filename = f"autodefine_cn_vn_{chinese_text}.mp3"
+
+    # Write audio to Anki's media collection
+    filename = note.col.media.write_data(safe_filename, audio_data)
+
+    return filename
 
 
 def get_chinese_text(editor: "Editor") -> str:
