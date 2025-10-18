@@ -56,17 +56,18 @@ def build(output_dir: Path | None = None) -> Path:
     if output_file.exists():
         output_file.unlink()
 
+    # Create build directory
+    build_root = project_root / "build"
+    build_dir = build_root / "autodefine_cn_vn"
+
     print("🚀 Building Anki addon package")
     print("=" * 50)
     print(f"Version: {version}")
     print(f"Source:  {src_dir}")
+    print(f"Build:   {build_dir}")
     print(f"Output:  {output_file}")
     print("=" * 50)
     print()
-
-    # Create build directory
-    build_root = project_root / "build"
-    build_dir = build_root / "autodefine_cn_vn"
 
     # Clean and recreate build directory
     if build_root.exists():
