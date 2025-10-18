@@ -179,13 +179,11 @@ def fill_sentence_field(
     if sentences:
         first_sentence = sentences[0]
         chinese = first_sentence.get("chinese", "")
-        vietnamese = first_sentence.get("vietnamese", "")
 
-        if chinese or vietnamese:
-            formatted_sentence = f"{chinese}<br>{vietnamese}"
+        if chinese:
             insert_into_field(
                 editor,
-                formatted_sentence,
+                chinese,
                 field_mapping.sentence_field,
                 overwrite=True,
             )

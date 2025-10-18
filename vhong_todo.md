@@ -15,7 +15,7 @@
 ### 0.2.x: Support sample sentences
 
 - [x] Parse sample sentences
-- [ ] Add one sample sentence to the card
+- [x] Add one sample sentence to the card
 - [ ] Highlighting the chinese word
 
 ### 0.2.x: Clean up
