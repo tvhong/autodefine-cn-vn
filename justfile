@@ -63,10 +63,9 @@ clean-build:
 build: clean-build
     uv run python scripts/build.py
 
-# Run Anki with the addon for testing
-run-anki:
-    @echo "Starting Anki for manual testing..."
-    @echo "TODO: Implement Anki launch script"
+# Build and run Anki with Test profile for manual testing (macOS)
+run-anki-macos: build
+    /Applications/Anki.app/Contents/MacOS/launcher -p Test
 
 # Get current version from pyproject.toml
 version:
