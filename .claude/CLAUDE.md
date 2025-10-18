@@ -4,12 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an Anki addon (v0.1.2) that automatically populates Chinese vocabulary cards with Vietnamese translations and pinyin pronunciations. The addon integrates with Anki's card editor through hooks and provides an editor button with keyboard shortcut (Ctrl+Alt+D) for manual triggering.
+This is an Anki addon (v0.2.0) that automatically populates Chinese vocabulary cards with Vietnamese translations and pinyin pronunciations. The addon integrates with Anki's card editor through hooks and provides an editor button with keyboard shortcut (Ctrl+Alt+D) for manual triggering.
 
 **Key Features:**
 
 - Fetches translations from http://2.vndic.net/index.php?word={}&dict=cn_vi
 - Parses pinyin pronunciation and Vietnamese definitions using BeautifulSoup4
+- Downloads and embeds audio pronunciations into Anki media collection
+- Extracts sample sentences with automatic highlighting of the target Chinese word
 - Configurable field mapping for different note types
 - Editor toolbar button with customizable keyboard shortcuts
 - Notification system with tooltips
@@ -50,6 +52,7 @@ just release-patch      # Release a patch version (0.1.2 -> 0.1.3)
 just release-minor      # Release a minor version (0.1.2 -> 0.2.0)
 just release-major      # Release a major version (0.1.2 -> 1.0.0)
 just release-dry-run VERSION  # Dry run to preview release changes
+just run-anki-macos     # Build and run Anki with Test profile (macOS only)
 ```
 
 ### Running Individual Tests
@@ -87,23 +90,31 @@ src/autodefine_cn_vn/
 
 **`config_manager.py`** - Configuration management using Anki's config API
 
-- `ConfigManager` class with methods: `get_field_mapping()`, `get_shortcuts()`, `get_api_settings()`
-- Loads configuration from Anki's addon manager
-- Supports config reloading
+- `ConfigManager` class with typed dataclasses for type-safe configuration
+- Dataclass models: `Config`, `FieldMapping`, `Shortcuts`, `ApiSettings`
+- Methods: `get_config()`, `get_field_mapping()`, `get_shortcuts()`, `get_api_settings()`
+- `DEFAULT_API_SETTINGS` constant for default API configuration
+- Loads configuration from Anki's addon manager with validation
+- Supports config reloading with `reload_config()`
 
 **`fetcher.py`** - Web scraping and parsing
 
+- TypedDicts: `SampleSentence`, `DictionaryContent` for type-safe data structures
 - `format_url(url_template, chinese_word)`: Formats URL with Chinese word
 - `fetch_webpage(url, timeout)`: Fetches HTML content from vndic.net
-- `parse_dictionary_content(html_content)`: Extracts pinyin and Vietnamese definitions using BeautifulSoup4
+- `parse_dictionary_content(html_content)`: Extracts pinyin, Vietnamese definitions, audio URLs, and sample sentences using BeautifulSoup4
+- `parse_sample_sentences(html_content)`: Extracts Chinese-Vietnamese sentence pairs
+- `fetch_audio(audio_url, base_url, timeout)`: Downloads audio pronunciation files
 
 **`ui_hooks.py`** - Anki editor integration
 
 - `init_ui_hooks()`: Registers editor button setup hook
 - `setup_editor_buttons(buttons, editor)`: Adds "自動" button to editor toolbar
-- `auto_define(editor)`: Main logic to fetch and populate fields
+- `auto_define(editor)`: Main logic to fetch and populate all fields
 - `get_chinese_text(editor)`: Extracts Chinese text from configured field
 - `insert_into_field(editor, text, field_name, overwrite)`: Updates note fields
+- Field-specific helpers: `fill_pinyin_field()`, `fill_vietnamese_field()`, `fill_sentence_field()`, `fill_audio_field()`
+- `download_audio(note, audio_url, chinese_text, url_template, timeout)`: Downloads and saves audio to Anki's media collection
 
 **`utils.py`** - Anki note utilities
 
@@ -126,11 +137,13 @@ src/autodefine_cn_vn/
 
 ```json
 {
+  "version": "v1",
   "field_mapping": {
     "chinese_field": "Chinese",
     "pinyin_field": "Pinyin",
     "vietnamese_field": "Vietnamese",
-    "audio_field": "Audio"
+    "audio_field": "Audio",
+    "sentence_field": "Sentence"
   },
   "shortcuts": {
     "auto_define_shortcut": "Ctrl+Alt+D"
@@ -191,6 +204,8 @@ if vendor_dir.exists() and str(vendor_dir) not in sys.path:
 - **Error handling**: Catches `urllib.error.HTTPError` and `urllib.error.URLError`
 - **User feedback**: Shows error messages via tooltips with 5-second duration
 - **URL encoding**: Chinese characters are automatically URL-encoded by `urllib`
+- **Audio downloads**: Downloads audio files as bytes and saves to Anki's media collection using `note.col.media.write_data()`
+- **Audio filename generation**: Uses pattern `autodefine_cn_vn_{chinese_text}.mp3`
 
 ### Anki Editor Integration
 
@@ -198,6 +213,8 @@ if vendor_dir.exists() and str(vendor_dir) not in sys.path:
 - **Field access**: Uses Anki's field map to get/set fields by name (not by index)
 - **Note updates**: Calls `editor.loadNote()` after field changes to refresh UI
 - **Save handling**: Uses `editor.saveNow()` callback to ensure note is saved before processing
+- **Field processing**: Separate helper functions for each field type (pinyin, vietnamese, sentence, audio) for cleaner code organization
+- **Media integration**: Audio files are saved to Anki's media collection and referenced using `[sound:filename]` syntax
 
 ### Error Handling Strategy
 
@@ -205,6 +222,8 @@ if vendor_dir.exists() and str(vendor_dir) not in sys.path:
 - **Missing fields**: Show configuration warning if field name doesn't exist in note type
 - **No data found**: Inform user when dictionary has no entry for the word
 - **Parsing errors**: Catch and display unexpected errors without breaking editor
+- **Audio download failures**: Non-blocking - shows warning but continues with other fields
+- **Graceful degradation**: Each field (pinyin, vietnamese, sentence, audio) is filled independently; failure in one doesn't prevent others from being populated
 
 ### Testing
 
@@ -215,7 +234,7 @@ if vendor_dir.exists() and str(vendor_dir) not in sys.path:
   - `tests/test_fetcher.py` - Web scraping and parsing tests
   - `tests/test_ui_hooks.py` - Editor integration tests
   - `tests/test_utils.py` - Utility function tests
-  - `tests/data/` - Real HTML samples from vndic.net for testing
+  - `tests/assets/` - Real HTML samples from vndic.net for testing
 - **Mocking**: Uses unittest.mock to mock Anki APIs (mw, editor, note, etc.)
 
 ## Translation Data Source
@@ -227,17 +246,29 @@ There are examples in `tests/assets/`
 
 1. **Pinyin**: Extracted from `<FONT COLOR=#7F0000>` tag, stripped of square brackets
 2. **Vietnamese definition**: Finds `<img src="...CB1FF077.png">` marker, then extracts text from next `<td>` sibling
+3. **Audio URL**: Extracted from `<span onclick="soundManager.play(...)">` onclick attribute
+4. **Sample sentences**: Finds `<img src="...72B02D27.png">` markers, extracts Chinese (red font) and Vietnamese (gray font) sentence pairs
 
 **Example HTML structure:**
 
 ```html
-<font color="#7F0000">[nǐmen]</font>
 <!-- Pinyin -->
+<font color="#7F0000">[nǐmen]</font>
+
+<!-- Vietnamese definition -->
 <img src="img/dict/CB1FF077.png" />
-<!-- Marker -->
 <td>các bạn, các anh, các chị</td>
-<!-- Vietnamese -->
+
+<!-- Audio -->
+<span onclick="soundManager.play('/mp3.php?id=...')">...</span>
+
+<!-- Sample sentence -->
+<img src="img/dict/72B02D27.png" />
+<td><font color="#FF0000">你们好！</font></td>
+<tr><td><font color="#7F7F7F">Các bạn khỏe không!</font></td></tr>
 ```
+
+**Sentence highlighting**: The target Chinese word is automatically wrapped in `<b>` tags when inserted into the sentence field (e.g., `<b>你们</b>` in the example sentence above).
 
 ## Build and Release Process
 
@@ -267,8 +298,8 @@ just release-major    # 0.1.2 -> 1.0.0
 The release script (`scripts/release.py`):
 
 1. Validates version format
-2. Updates `pyproject.toml`
-3. Updates `manifest.json` (if exists)
+2. Updates `pyproject.toml` with new version
+3. Updates `src/autodefine_cn_vn/manifest.json` with new version
 4. Commits changes with version message
 5. Creates git tag
 6. Updates CHANGELOG.md
