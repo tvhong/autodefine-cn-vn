@@ -60,7 +60,7 @@ clean-build:
     rm -rf dist/ build/
 
 # Build Anki addon package
-build:
+build: clean-build
     uv run python scripts/build.py
 
 # Run Anki with the addon for testing
