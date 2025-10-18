@@ -94,16 +94,28 @@ def build(output_dir: Path | None = None) -> Path:
 def copy_addon_files(src_dir: Path, dest_dir: Path) -> None:
     """Copy addon source files to destination.
 
+    Only copies files tracked by git (respects .gitignore).
+
     Args:
         src_dir: Source directory (src/autodefine_cn_vn)
         dest_dir: Destination directory for build
     """
     print(f"📋 Copying addon files from {src_dir} to {dest_dir}...")
 
-    # Copy all Python files and JSON configs
-    for pattern in ["*.py", "*.json"]:
-        for file in src_dir.glob(pattern):
-            shutil.copy2(file, dest_dir / file.name)
+    # Get git-tracked files from source directory
+    result = subprocess.run(
+        ["git", "ls-files", str(src_dir)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    # Copy each tracked file
+    for file_path in result.stdout.strip().split("\n"):
+        if file_path:  # Skip empty lines
+            src_file = Path(file_path)
+            dest_file = dest_dir / src_file.name
+            shutil.copy2(src_file, dest_file)
 
     print("✓ Addon files copied")
 
