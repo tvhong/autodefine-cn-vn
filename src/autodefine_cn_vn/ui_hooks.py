@@ -9,6 +9,7 @@ from anki.notes import Note
 
 from autodefine_cn_vn.config_manager import ConfigManager, FieldMapping
 from autodefine_cn_vn.fetcher import (
+    DictionaryContent,
     fetch_audio,
     fetch_webpage,
     format_url,
@@ -85,7 +86,9 @@ def auto_define(editor: "Editor") -> None:
         pinyin_filled = fill_pinyin_field(editor, parsed_data, field_mapping)
         vietnamese_filled = fill_vietnamese_field(editor, parsed_data, field_mapping)
         sentence_filled = fill_sentence_field(editor, parsed_data, field_mapping, chinese_text)
-        fill_audio_field(editor, parsed_data, field_mapping, chinese_text, url_template, timeout)
+        _ = fill_audio_field(
+            editor, parsed_data, field_mapping, chinese_text, url_template, timeout
+        )
 
         if pinyin_filled or vietnamese_filled or sentence_filled:
             notify(f"AutoDefine: Successfully filled fields for '{chinese_text}'")
@@ -113,13 +116,13 @@ def auto_define(editor: "Editor") -> None:
 
 
 def fill_pinyin_field(
-    editor: "Editor", parsed_data: dict[str, str], field_mapping: FieldMapping
+    editor: "Editor", parsed_data: DictionaryContent, field_mapping: FieldMapping
 ) -> bool:
     """Fill pinyin field from parsed data.
 
     Args:
         editor: Anki editor instance
-        parsed_data: Dictionary containing parsed pinyin and vietnamese data
+        parsed_data: DictionaryContent containing parsed data
         field_mapping: Field mapping configuration object
 
     Returns:
@@ -138,13 +141,13 @@ def fill_pinyin_field(
 
 
 def fill_vietnamese_field(
-    editor: "Editor", parsed_data: dict[str, str], field_mapping: FieldMapping
+    editor: "Editor", parsed_data: DictionaryContent, field_mapping: FieldMapping
 ) -> bool:
     """Fill vietnamese field from parsed data.
 
     Args:
         editor: Anki editor instance
-        parsed_data: Dictionary containing parsed pinyin and vietnamese data
+        parsed_data: DictionaryContent containing parsed data
         field_mapping: Field mapping configuration object
 
     Returns:
@@ -164,7 +167,7 @@ def fill_vietnamese_field(
 
 def fill_sentence_field(
     editor: "Editor",
-    parsed_data: dict[str, str],
+    parsed_data: DictionaryContent,
     field_mapping: FieldMapping,
     chinese_word: str,
 ) -> bool:
@@ -172,7 +175,7 @@ def fill_sentence_field(
 
     Args:
         editor: Anki editor instance
-        parsed_data: Dictionary containing parsed data including sentences
+        parsed_data: DictionaryContent containing parsed data including sentences
         field_mapping: Field mapping configuration object
         chinese_word: Chinese word being learned to highlight in sentence
 
@@ -199,7 +202,7 @@ def fill_sentence_field(
 
 def fill_audio_field(
     editor: "Editor",
-    parsed_data: dict[str, str],
+    parsed_data: DictionaryContent,
     field_mapping: FieldMapping,
     chinese_text: str,
     url_template: str,
@@ -209,7 +212,7 @@ def fill_audio_field(
 
     Args:
         editor: Anki editor instance
-        parsed_data: Dictionary containing parsed data including audio_url
+        parsed_data: DictionaryContent containing parsed data including audio_url
         field_mapping: Field mapping configuration object
         chinese_text: Chinese text used for filename generation
         url_template: Template URL to extract base URL from
