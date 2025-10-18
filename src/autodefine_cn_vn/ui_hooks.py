@@ -84,9 +84,10 @@ def auto_define(editor: "Editor") -> None:
         # Fill fields using helper methods
         pinyin_filled = fill_pinyin_field(editor, parsed_data, field_mapping)
         vietnamese_filled = fill_vietnamese_field(editor, parsed_data, field_mapping)
+        sentence_filled = fill_sentence_field(editor, parsed_data, field_mapping)
         fill_audio_field(editor, parsed_data, field_mapping, chinese_text, url_template, timeout)
 
-        if pinyin_filled or vietnamese_filled:
+        if pinyin_filled or vietnamese_filled or sentence_filled:
             notify(f"AutoDefine: Successfully filled fields for '{chinese_text}'")
         else:
             notify(
@@ -158,6 +159,37 @@ def fill_vietnamese_field(
             overwrite=True,
         )
         return True
+    return False
+
+
+def fill_sentence_field(
+    editor: "Editor", parsed_data: dict[str, str], field_mapping: FieldMapping
+) -> bool:
+    """Fill sentence field with first sample sentence from parsed data.
+
+    Args:
+        editor: Anki editor instance
+        parsed_data: Dictionary containing parsed data including sentences
+        field_mapping: Field mapping configuration object
+
+    Returns:
+        bool: True if sentence was filled, False otherwise
+    """
+    sentences = parsed_data.get("sentences", [])
+    if sentences:
+        first_sentence = sentences[0]
+        chinese = first_sentence.get("chinese", "")
+        vietnamese = first_sentence.get("vietnamese", "")
+
+        if chinese or vietnamese:
+            formatted_sentence = f"{chinese}<br>{vietnamese}"
+            insert_into_field(
+                editor,
+                formatted_sentence,
+                field_mapping.sentence_field,
+                overwrite=True,
+            )
+            return True
     return False
 
 

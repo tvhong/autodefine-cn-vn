@@ -9,6 +9,7 @@ from autodefine_cn_vn.ui_hooks import (
     auto_define,
     fill_audio_field,
     fill_pinyin_field,
+    fill_sentence_field,
     fill_vietnamese_field,
     get_chinese_text,
     init_ui_hooks,
@@ -215,6 +216,70 @@ class TestFillVietnameseField:
         parsed_data = {"pinyin": "nǐhǎo"}
 
         result = fill_vietnamese_field(mock_editor, parsed_data, get_field_mapping())
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+
+class TestFillSentenceField:
+    """Tests for fill_sentence_field helper function."""
+
+    def test_fills_sentence_field_when_present(self, mock_editor):
+        """Test that fill_sentence_field fills the sentence field when sentences are present."""
+        parsed_data = {
+            "pinyin": "nǐhǎo",
+            "vietnamese": "xin chào",
+            "sentences": [
+                {"chinese": "你好吗？", "vietnamese": "Bạn khỏe không?"},
+                {"chinese": "你好世界。", "vietnamese": "Xin chào thế giới."},
+            ],
+        }
+
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+
+        assert result is True
+        assert mock_editor.note.fields[4] == "你好吗？<br>Bạn khỏe không?"
+        mock_editor.loadNote.assert_called_once()
+
+    def test_formats_sentence_with_html_line_break(self, mock_editor):
+        """Test that fill_sentence_field formats sentence with HTML line break."""
+        parsed_data = {"sentences": [{"chinese": "你们好。", "vietnamese": "Xin chào các bạn."}]}
+
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+
+        assert result is True
+        assert "<br>" in mock_editor.note.fields[4]
+        assert mock_editor.note.fields[4] == "你们好。<br>Xin chào các bạn."
+
+    def test_uses_first_sentence_only(self, mock_editor):
+        """Test that fill_sentence_field uses only the first sentence."""
+        parsed_data = {
+            "sentences": [
+                {"chinese": "第一句。", "vietnamese": "Câu thứ nhất."},
+                {"chinese": "第二句。", "vietnamese": "Câu thứ hai."},
+            ]
+        }
+
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+
+        assert result is True
+        assert mock_editor.note.fields[4] == "第一句。<br>Câu thứ nhất."
+        assert "第二句" not in mock_editor.note.fields[4]
+
+    def test_returns_false_when_sentences_empty(self, mock_editor):
+        """Test that fill_sentence_field returns False when sentences list is empty."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào", "sentences": []}
+
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+    def test_returns_false_when_sentences_missing(self, mock_editor):
+        """Test that fill_sentence_field returns False when sentences key is missing."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
 
         assert result is False
         mock_editor.loadNote.assert_not_called()
