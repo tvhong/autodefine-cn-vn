@@ -24,6 +24,8 @@
 - [ ] Allow empty "field" for optional configs such as audio and sample sentences
 - [ ] Fix shortcut
 - [ ] Separate fetcher and parser
+- [ ] Add justfile command to link to addonfolder on mac
+- [x] Add justfile command to build and run launcher script
 
 ### 0.2.x: Support multiple definitions
 
