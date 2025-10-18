@@ -235,20 +235,20 @@ class TestFillSentenceField:
             ],
         }
 
-        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "你好")
 
         assert result is True
-        assert mock_editor.note.fields[4] == "你好吗？"
+        assert mock_editor.note.fields[4] == "<b>你好</b>吗？"
         mock_editor.loadNote.assert_called_once()
 
     def test_fills_only_chinese_sentence(self, mock_editor):
         """Test that fill_sentence_field fills only Chinese text without Vietnamese."""
         parsed_data = {"sentences": [{"chinese": "你们好。", "vietnamese": "Xin chào các bạn."}]}
 
-        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "你们")
 
         assert result is True
-        assert mock_editor.note.fields[4] == "你们好。"
+        assert mock_editor.note.fields[4] == "<b>你们</b>好。"
         assert "Xin chào" not in mock_editor.note.fields[4]
         assert "<br>" not in mock_editor.note.fields[4]
 
@@ -261,18 +261,30 @@ class TestFillSentenceField:
             ]
         }
 
-        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "第一")
 
         assert result is True
-        assert mock_editor.note.fields[4] == "第一句。"
+        assert mock_editor.note.fields[4] == "<b>第一</b>句。"
         assert "第二句" not in mock_editor.note.fields[4]
         assert "Câu thứ" not in mock_editor.note.fields[4]
+
+    def test_highlights_word_when_appears_multiple_times(self, mock_editor):
+        """Test that fill_sentence_field highlights all occurrences of the word."""
+        parsed_data = {
+            "sentences": [{"chinese": "我我我很好。", "vietnamese": "Tôi tôi tôi rất khỏe."}]
+        }
+
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "我")
+
+        assert result is True
+        assert mock_editor.note.fields[4] == "<b>我</b><b>我</b><b>我</b>很好。"
+        mock_editor.loadNote.assert_called_once()
 
     def test_returns_false_when_sentences_empty(self, mock_editor):
         """Test that fill_sentence_field returns False when sentences list is empty."""
         parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào", "sentences": []}
 
-        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "你好")
 
         assert result is False
         mock_editor.loadNote.assert_not_called()
@@ -281,7 +293,7 @@ class TestFillSentenceField:
         """Test that fill_sentence_field returns False when sentences key is missing."""
         parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
 
-        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping())
+        result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "你好")
 
         assert result is False
         mock_editor.loadNote.assert_not_called()

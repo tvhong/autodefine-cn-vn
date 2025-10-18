@@ -16,7 +16,7 @@
 
 - [x] Parse sample sentences
 - [x] Add one sample sentence to the card
-- [ ] Highlighting the chinese word
+- [x] Highlighting the chinese word
 
 ### 0.2.x: Clean up
 
@@ -32,9 +32,10 @@
 
 ## 0.x: Nice to have features
 
-- [ ] Have a nice icon
+- [ ] Have a nice icon for the button
+- [ ] Add a default card type
 - [ ] Support default tags such as "language::chinese" as well
-- [ ] Make this more generic for different dictionary_sources
+- [ ] Make this more generic for different dictionary_sources (not just chinese vietnamese)
 - [ ] Support multiple card types
 
 ### Won't do

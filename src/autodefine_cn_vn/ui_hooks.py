@@ -84,7 +84,7 @@ def auto_define(editor: "Editor") -> None:
         # Fill fields using helper methods
         pinyin_filled = fill_pinyin_field(editor, parsed_data, field_mapping)
         vietnamese_filled = fill_vietnamese_field(editor, parsed_data, field_mapping)
-        sentence_filled = fill_sentence_field(editor, parsed_data, field_mapping)
+        sentence_filled = fill_sentence_field(editor, parsed_data, field_mapping, chinese_text)
         fill_audio_field(editor, parsed_data, field_mapping, chinese_text, url_template, timeout)
 
         if pinyin_filled or vietnamese_filled or sentence_filled:
@@ -163,7 +163,10 @@ def fill_vietnamese_field(
 
 
 def fill_sentence_field(
-    editor: "Editor", parsed_data: dict[str, str], field_mapping: FieldMapping
+    editor: "Editor",
+    parsed_data: dict[str, str],
+    field_mapping: FieldMapping,
+    chinese_word: str,
 ) -> bool:
     """Fill sentence field with first sample sentence from parsed data.
 
@@ -171,6 +174,7 @@ def fill_sentence_field(
         editor: Anki editor instance
         parsed_data: Dictionary containing parsed data including sentences
         field_mapping: Field mapping configuration object
+        chinese_word: Chinese word being learned to highlight in sentence
 
     Returns:
         bool: True if sentence was filled, False otherwise
@@ -181,9 +185,11 @@ def fill_sentence_field(
         chinese = first_sentence.get("chinese", "")
 
         if chinese:
+            # Highlight the Chinese word being learned with <b> tags
+            highlighted_sentence = chinese.replace(chinese_word, f"<b>{chinese_word}</b>")
             insert_into_field(
                 editor,
-                chinese,
+                highlighted_sentence,
                 field_mapping.sentence_field,
                 overwrite=True,
             )
