@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-10-19
+
+### Added
+
+- **Multiple Definitions Support**: Now handles multiple Vietnamese definitions from dictionary
+- **Multiple Sample Sentences**: Displays all available sample sentences (not just the first one)
+- **Optional Field Configuration**: Fields (pinyin, vietnamese, sentence, audio) can now be optional in config
+
+### Fixed
+
+- **UTF-8 Encoding**: Fixed issue with UTF-8 encoding when fetching webpages
+
+### Development
+
+- **Parser Module**: New `parser.py` module for separating parsing logic from fetching
+- **Code Organization**:
+  - Extracted auto-define logic to separate `auto_define.py` module (later renamed to `auto_fill`)
+  - Separated fetcher and parser into distinct modules for better maintainability
+  - Added `parser.py` with dedicated parsing tests in `test_parser.py`
+- **Build System**:
+  - Added `link-to-anki` command to justfile for easier development setup
+  - Created `scripts/link_to_anki.py` for automatic symlink creation
+  - Updated README.md with documentation for `link-to-anki` command
+- **Testing**:
+  - Added comprehensive tests for UTF-8 encoding handling
+  - Added tests for parser module
+  - Enhanced test coverage for optional fields and multiple definitions
+- **Developer Experience**:
+  - `notify()` function now includes line numbers for easier debugging
+  - Improved error messages and notifications
+- **Dependency Upgrade**: Updated Anki dependency to version 25.9.x
+
 ## [0.2.1] - 2025-10-18
 
 ### Added
@@ -117,6 +149,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation (README.md, LICENSE)
 - Development workflow and todo tracking
 
+[0.2.2]: https://github.com/yourusername/autodefine-cn-vn/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/yourusername/autodefine-cn-vn/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/yourusername/autodefine-cn-vn/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/yourusername/autodefine-cn-vn/compare/v0.1.2...v0.1.3
