@@ -10,14 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Sample Sentence Support**: Automatically extracts and displays example sentences from vndic.net
-  - `parse_sample_sentences()` function for extracting Chinese-Vietnamese sentence pairs
-  - `fill_sentence_field()` function for populating sentence field in Anki notes
-  - `sentence_field` configuration option in config.json
   - Automatic highlighting of target Chinese word in bold (`<b>` tags)
   - Sample sentences include both Chinese text and Vietnamese translation
 
-### Changed
+### Development
 
+- Updated CLAUDE.md with comprehensive documentation on sample sentence feature
+- Added detailed HTML structure examples for vndic.net parsing
+- Expanded test coverage for sample sentence extraction
 - **Build System Improvements**:
   - Build script now displays output path after successful build
   - Gitignored files are no longer copied during build process
@@ -29,38 +29,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Separated highlighting logic from parsing (now done during field insertion)
   - Enhanced type hints with `dict` type annotations in UI hooks
 
-### Development
-
-- Updated CLAUDE.md with comprehensive documentation on sample sentence feature
-- Added detailed HTML structure examples for vndic.net parsing
-- Expanded test coverage for sample sentence extraction
-
 ## [0.2.0] - 2025-10-17
 
 ### Added
 
 - **Audio Support**: Automatically fetches and downloads audio pronunciation files
-  - `fetch_audio()` function for downloading audio files from vndic.net
-  - Audio URL extraction in `parse_dictionary_content()`
-  - Audio field is automatically populated with pronunciation audio
 - **Type-Safe Configuration**: Implemented dataclasses for configuration management
-  - `FieldMapping` dataclass for field name mappings
-  - `Shortcuts` dataclass for keyboard shortcuts
-  - `ApiSettings` dataclass for API settings
-  - `Config` dataclass for complete configuration
-  - Version field in config.json for future migration support
 
 ### Changed
 
 - **Configuration Structure**: Simplified configuration with hardcoded API defaults
-  - API settings now use `DEFAULT_API_SETTINGS` constant
-  - Removed user-configurable API settings from config.json
-  - All config classes are now frozen dataclasses for immutability
 - **Code Organization**: Improved code structure and maintainability
-  - Extracted `fill_pinyin_field()`, `fill_vietnamese_field()`, and `fill_audio_field()` functions
-  - Refactored audio download logic into separate function
-  - Used constant `FIELD_MAPPING` for field name lookups
-  - Enhanced type hints throughout the codebase
 
 ### Removed
 
@@ -113,33 +92,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Configuration Management**: Implemented `ConfigManager` class for handling Anki addon configuration
-  - Field mapping for Chinese, Pinyin, Vietnamese, and Audio fields
-  - API settings configuration
-  - Keyboard shortcuts configuration
-  - Config reload capability
 - **UI Hooks**: Added editor integration with Anki's card editor
-  - Auto-define button in editor toolbar
-  - Field extraction and insertion utilities
-  - Hook registration for editor events
 - **Utility Functions**: Created `utils.py` module with helper functions
-  - `get_field()`: Extract field values from Anki notes
-  - `set_field()`: Update field values in Anki notes
-  - `unwrap()`: Safe unwrapping of optional values
 - **Test Suite**: Comprehensive test coverage (99%) with pytest
-  - Unit tests for config manager
-  - Unit tests for UI hooks
-  - Unit tests for utility functions
-  - Test fixtures and mocking setup
-
-### Changed
-
-- Adopted `src/` layout for better package structure
-- Moved `config.json` to correct package location
-- Added type annotations throughout codebase
-- Refactored UI hooks to use utility methods
 
 ### Development
 
+- Added type annotations throughout codebase
+- Refactored UI hooks to use utility methods
+- Moved `config.json` to correct package location
+- Adopted `src/` layout for better package structure
 - Added `justfile` for common development tasks (lint, format, test, CI)
 - Integrated `ruff` for linting and formatting
 - Added pytest with coverage reporting
