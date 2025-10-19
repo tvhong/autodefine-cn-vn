@@ -23,7 +23,7 @@
 - [x] An issue with word 斯 (xi), 讨厌
 - [x] Notify should get the previous line number as well
 - [x] Upgrade version of anki and aqt to 25.9.x
-- [ ] Add multiple sample sentences
+- [x] Add multiple sample sentences
 - [ ] Add multiple definitions
 - [ ] Allow empty "field" for optional configs such as audio and sample sentences
 - [ ] Fix shortcut

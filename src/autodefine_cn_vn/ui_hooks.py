@@ -171,7 +171,7 @@ def fill_sentence_field(
     field_mapping: FieldMapping,
     chinese_word: str,
 ) -> bool:
-    """Fill sentence field with first sample sentence from parsed data.
+    """Fill sentence field with all sample sentences from parsed data.
 
     Args:
         editor: Anki editor instance
@@ -183,20 +183,28 @@ def fill_sentence_field(
         bool: True if sentence was filled, False otherwise
     """
     sentences = parsed_data.get("sentences", [])
-    if sentences:
-        first_sentence = sentences[0]
-        chinese = first_sentence.get("chinese", "")
+    if not sentences:
+        return False
 
+    highlighted_sentences = []
+    for sentence in sentences:
+        chinese = sentence.get("chinese", "")
         if chinese:
             # Highlight the Chinese word being learned with <b> tags
             highlighted_sentence = chinese.replace(chinese_word, f"<b>{chinese_word}</b>")
-            insert_into_field(
-                editor,
-                highlighted_sentence,
-                field_mapping.sentence_field,
-                overwrite=True,
-            )
-            return True
+            highlighted_sentences.append(highlighted_sentence)
+
+    if highlighted_sentences:
+        # Join multiple sentences with <br> tags
+        combined_sentences = "<br>".join(highlighted_sentences)
+        insert_into_field(
+            editor,
+            combined_sentences,
+            field_mapping.sentence_field,
+            overwrite=True,
+        )
+        return True
+
     return False
 
 

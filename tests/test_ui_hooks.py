@@ -225,7 +225,7 @@ class TestFillSentenceField:
     """Tests for fill_sentence_field helper function."""
 
     def test_fills_sentence_field_when_present(self, mock_editor):
-        """Test that fill_sentence_field fills the sentence field when sentences are present."""
+        """Test that fill_sentence_field fills the sentence field with all sentences."""
         parsed_data = {
             "pinyin": "nǐhǎo",
             "vietnamese": "xin chào",
@@ -238,7 +238,7 @@ class TestFillSentenceField:
         result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "你好")
 
         assert result is True
-        assert mock_editor.note.fields[4] == "<b>你好</b>吗？"
+        assert mock_editor.note.fields[4] == "<b>你好</b>吗？<br><b>你好</b>世界。"
         mock_editor.loadNote.assert_called_once()
 
     def test_fills_only_chinese_sentence(self, mock_editor):
@@ -252,8 +252,8 @@ class TestFillSentenceField:
         assert "Xin chào" not in mock_editor.note.fields[4]
         assert "<br>" not in mock_editor.note.fields[4]
 
-    def test_uses_first_sentence_only(self, mock_editor):
-        """Test that fill_sentence_field uses only the first sentence."""
+    def test_uses_all_sentences(self, mock_editor):
+        """Test that fill_sentence_field uses all sentences with <br> separator."""
         parsed_data = {
             "sentences": [
                 {"chinese": "第一句。", "vietnamese": "Câu thứ nhất."},
@@ -264,8 +264,10 @@ class TestFillSentenceField:
         result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "第一")
 
         assert result is True
-        assert mock_editor.note.fields[4] == "<b>第一</b>句。"
-        assert "第二句" not in mock_editor.note.fields[4]
+        assert mock_editor.note.fields[4] == "<b>第一</b>句。<br>第二句。"
+        assert "第二句" in mock_editor.note.fields[4]
+        assert "<br>" in mock_editor.note.fields[4]
+        # Vietnamese translations should not be included
         assert "Câu thứ" not in mock_editor.note.fields[4]
 
     def test_highlights_word_when_appears_multiple_times(self, mock_editor):
