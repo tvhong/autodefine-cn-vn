@@ -58,53 +58,68 @@ Default field configuration:
 
 - Python 3.12+
 - Anki 25.09.x
+- `uv` for dependency management
+- `just` for running tasks
 
 ### Setup
 
 ```bash
 git clone https://github.com/yourusername/autodefine-cn-vn.git
 cd autodefine-cn-vn
-uv sync
+just install  # Installs dependencies with uv
 ```
 
-### Testing
+### Common Commands
+
+See the [justfile](justfile) for all available commands. Most commonly used:
 
 ```bash
-python -m pytest tests/
+just test          # Run tests
+just lint          # Check code style
+just format        # Format code
+just fix           # Auto-fix lint and format issues
+just ci            # Run full CI pipeline (format, lint, test)
+just link-to-anki  # Set up addon for development testing (macOS)
+just run-anki-macos  # Run Anki on macos
 ```
 
-### Manual Test
+### Manual Testing
 
-#### Add local repo as add-on
+#### Automated Setup (macOS)
 
-To iterate quickly on your changes, you should add the local repo to Anki as an add-on.
-The manual testing cycle then becomes: make code changes, restart Anki, and test your change.
+```bash
+just link-to-anki  # Builds and symlinks to Anki's addon folder
+```
+
+This command will automatically build the addon and create a symlink to Anki's addon directory.
+After making code changes, run `just link-to-anki` again and restart Anki to test your changes.
+
+##### Manual Setup (All Platforms)
+
+To iterate quickly on your changes, you should symlink the addon to Anki's addon folder.
+The manual testing cycle then becomes: make code changes, rebuild, restart Anki, and test.
 
 Steps:
 
-1. Find where Anki stores its add-on: Open Anki > Tools > Add-ons > View Files.
-2. Then create a symlink from Anki's add-on directory to your "ir" directory.
-   For example:
-   - My Anki add-on directory is `$HOME/.local/share/Anki2/addons21`.
-   - My local workspace is `$HOME/workplace/autodefine-cn-vn`.
-   - Then to add my local workspace as an Anki add-on, I'd run
-   ```shell
-   ln -s $HOME/workplace/autodefine-cn-vn/src/autodefine_cn_vn/  $HOME/.local/share/Anki2/addons21/autodefine_cn_vn
+1. Find where Anki stores addons: Open Anki > Tools > Add-ons > View Files
+2. Build the addon and create a symlink:
+
+   ```bash
+   # Build the addon (includes vendored dependencies)
+   just build
+
+   # Create symlink (example paths - adjust for your system)
+   ln -s $HOME/workplace/autodefine-cn-vn/build/autodefine_cn_vn \
+         $HOME/.local/share/Anki2/addons21/autodefine_cn_vn
    ```
-3. Restart Anki.
 
-#### Run Anki
+#### Running Anki for Testing
 
-1. Create a "Test" profile to test your changes, for your own safety.
-2. Then run Anki from terminal. This will show stdout, which is useful for debugging.
+Create a "Test" profile for safer testing, then run Anki from terminal to see debug output:
 
-   ```shell
-   # On Ubuntu
-   /usr/local/bin/anki -p Test
-
-   # On Mac
-   /Applications/Anki.app/Contents/MacOS/anki -p Test
-   ```
+```bash
+just run-anki-macos
+```
 
 ## Contributing
 
@@ -134,4 +149,3 @@ If you encounter issues or have suggestions:
 ---
 
 **Note**: This addon is currently under development. Please report any bugs or feature requests through GitHub Issues.
-
