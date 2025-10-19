@@ -6,13 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from autodefine_cn_vn.fetcher import (
-    fetch_audio,
-    fetch_webpage,
-    format_url,
-    parse_dictionary_content,
-    parse_sample_sentences,
-)
+from autodefine_cn_vn.fetcher import fetch_audio, fetch_webpage, format_url
+from autodefine_cn_vn.parser import parse_dictionary_content, parse_sample_sentences
 
 
 class TestFormatUrl:

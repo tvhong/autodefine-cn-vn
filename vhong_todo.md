@@ -27,7 +27,7 @@
 - [x] Add multiple definitions
 - [x] Allow empty "field" for optional configs such as audio and sample sentences. Only require "chinese" field.
 - [x] Should use `<br>` to break vietnamese definitions instead of `\n`
-- [ ] Separate fetcher and parser
+- [x] Separate fetcher and parser
 - [ ] Move auto_define function into its own file, called auto_define.py or something
   - [ ] Let's find a good name for this function first
 - [ ] Add justfile command to link to addonfolder on mac (link from the build folder to Mac's Application)
@@ -35,19 +35,31 @@
   - Maybe does a search in Mac's Application folder first and ask user potential locations
 - [ ] Fix shortcut
 - [x] Add justfile command to build and run launcher script
+- [ ] DictionaryContent values can be optional
+- [ ] Use dataclass instead of DictionaryContent
 
 ### 0.2.x: Support multiple definitions
 
 - [x] Parse all definitions
 - [x] Pass all of them into the field
 
+## 0.3.0: Release prep
+
+### 0.3.x: Branding
+
+- [ ] Find a good name for the addin
+- [ ] Have a nice icon for the button
+- [ ] Documentation for the configuration
+- [ ] Create a documentation page (e.g., readthedoc)
+
 ## 0.x: Nice to have features
 
-- [ ] Have a nice icon for the button
-- [ ] Add a default card type
 - [ ] Support default tags such as "language::chinese" as well
 - [ ] Make this more generic for different dictionary_sources (not just chinese vietnamese)
+- [ ] Add a default card type via a menu?
 - [ ] Support multiple card types
+- [ ] Add validation (and meaningful error messages) for configuration.
+- [ ] Separate this into a lib/ and a src/.
 
 ### Won't do
 

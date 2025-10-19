@@ -8,13 +8,8 @@ from anki.hooks import addHook
 from anki.notes import Note
 
 from autodefine_cn_vn.config_manager import ConfigManager, FieldMapping
-from autodefine_cn_vn.fetcher import (
-    DictionaryContent,
-    fetch_audio,
-    fetch_webpage,
-    format_url,
-    parse_dictionary_content,
-)
+from autodefine_cn_vn.fetcher import fetch_audio, fetch_webpage, format_url
+from autodefine_cn_vn.parser import DictionaryContent, parse_dictionary_content
 from autodefine_cn_vn.utils import get_field, notify, set_field
 
 if TYPE_CHECKING:
