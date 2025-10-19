@@ -114,16 +114,24 @@ class TestUnwrap:
 class TestNotify:
     """Tests for notify function."""
 
-    def test_calls_tooltip_with_message(self):
-        """Test that notify calls tooltip with the message."""
+    def test_calls_tooltip_with_message_and_line_info(self):
+        """Test that notify calls tooltip with the message and caller info."""
         with (
             patch("autodefine_cn_vn.utils.tooltip") as mock_tooltip,
             patch("builtins.print") as mock_print,
         ):
             notify("Test message")
 
-            mock_tooltip.assert_called_once_with("Test message", period=3000)
-            mock_print.assert_called_once_with("Test message")
+            # Verify the message includes filename and line number
+            call_args = mock_tooltip.call_args
+            assert call_args is not None
+            message = call_args[0][0]
+            assert message.startswith("[test_utils.py:")
+            assert "] Test message" in message
+            assert call_args[1]["period"] == 3000
+
+            # Verify print was called with the same formatted message
+            mock_print.assert_called_once_with(message)
 
     def test_calls_tooltip_with_custom_period(self):
         """Test that notify respects custom period."""
@@ -133,13 +141,25 @@ class TestNotify:
         ):
             notify("Test message", period=5000)
 
-            mock_tooltip.assert_called_once_with("Test message", period=5000)
-            mock_print.assert_called_once_with("Test message")
+            # Verify the message includes caller info
+            call_args = mock_tooltip.call_args
+            assert call_args is not None
+            message = call_args[0][0]
+            assert message.startswith("[test_utils.py:")
+            assert "] Test message" in message
+            assert call_args[1]["period"] == 5000
 
-    def test_prints_to_stdout(self):
-        """Test that notify prints the message to stdout."""
+            mock_print.assert_called_once_with(message)
+
+    def test_prints_to_stdout_with_line_info(self):
+        """Test that notify prints the message with line info to stdout."""
         with patch("autodefine_cn_vn.utils.tooltip"), patch("builtins.print") as mock_print:
             message = "AutoDefine: Successfully filled fields"
             notify(message)
 
-            mock_print.assert_called_once_with(message)
+            # Verify the printed message includes filename and line number
+            call_args = mock_print.call_args
+            assert call_args is not None
+            printed_message = call_args[0][0]
+            assert printed_message.startswith("[test_utils.py:")
+            assert f"] {message}" in printed_message

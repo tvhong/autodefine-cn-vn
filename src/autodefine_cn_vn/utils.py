@@ -1,5 +1,8 @@
 """Utility functions for working with Anki notes and fields."""
 
+import inspect
+from pathlib import Path
+
 from anki.notes import Note
 from aqt import mw
 from aqt.utils import tooltip
@@ -8,12 +11,24 @@ from aqt.utils import tooltip
 def notify(message: str, period: int = 3000) -> None:
     """Show a tooltip in Anki UI and print the same message to stdout.
 
+    Automatically includes the caller's filename and line number for debugging.
+
     Args:
         message: The message to display and print
         period: How long to show the tooltip in milliseconds (default: 3000)
     """
-    tooltip(message, period=period)
-    print(message)
+    # Get caller's frame info
+    frame = inspect.currentframe()
+    if frame and frame.f_back:
+        caller_frame = frame.f_back
+        filename = Path(caller_frame.f_code.co_filename).name
+        line_number = caller_frame.f_lineno
+        formatted_message = f"[{filename}:{line_number}] {message}"
+    else:
+        formatted_message = message
+
+    tooltip(formatted_message, period=period)
+    print(formatted_message)
 
 
 def get_field(note: Note, field_name: str) -> str:
