@@ -9,8 +9,8 @@ description = "Automatically define Anki cards with Vietnamese definitions for C
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "anki>=24.0.0",
-    "aqt>=24.0.0",
+    "anki>=25.9.0",
+    "aqt>=25.9.0",
     "beautifulsoup4>=4.12.0",
 ]
 
