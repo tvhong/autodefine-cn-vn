@@ -1,11 +1,11 @@
-"""Tests for auto_define module."""
+"""Tests for auto_fill module."""
 
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from autodefine_cn_vn.auto_define import (
-    auto_define,
+from autodefine_cn_vn.auto_fill import (
+    auto_fill,
     fill_audio_field,
     fill_pinyin_field,
     fill_sentence_field,
@@ -138,7 +138,7 @@ class TestInsertIntoField:
 
     def test_handles_field_not_found(self, mock_editor, mock_mw):
         """Test that insert_into_field handles field not found gracefully."""
-        with patch("autodefine_cn_vn.auto_define.notify") as mock_notify:
+        with patch("autodefine_cn_vn.auto_fill.notify") as mock_notify:
             insert_into_field(mock_editor, "text", "NonExistentField", overwrite=True)
 
             mock_notify.assert_called_once()
@@ -340,7 +340,7 @@ class TestFillAudioField:
             "audio_url": "http://example.com/audio.mp3",
         }
 
-        with patch("autodefine_cn_vn.auto_define.download_audio") as mock_download_audio:
+        with patch("autodefine_cn_vn.auto_fill.download_audio") as mock_download_audio:
             mock_download_audio.return_value = "autodefine_cn_vn_你好.mp3"
 
             result = fill_audio_field(
@@ -426,8 +426,8 @@ class TestFillAudioField:
         }
 
         with (
-            patch("autodefine_cn_vn.auto_define.download_audio") as mock_download_audio,
-            patch("autodefine_cn_vn.auto_define.notify") as mock_notify,
+            patch("autodefine_cn_vn.auto_fill.download_audio") as mock_download_audio,
+            patch("autodefine_cn_vn.auto_fill.notify") as mock_notify,
         ):
             mock_download_audio.side_effect = Exception("Download failed")
 
@@ -470,38 +470,38 @@ class TestFillAudioField:
 @pytest.fixture
 def mock_fetch_webpage():
     """Mock fetch_webpage function."""
-    with patch("autodefine_cn_vn.auto_define.fetch_webpage") as mock:
+    with patch("autodefine_cn_vn.auto_fill.fetch_webpage") as mock:
         yield mock
 
 
 @pytest.fixture
 def mock_parse_dictionary_content():
     """Mock parse_dictionary_content function."""
-    with patch("autodefine_cn_vn.auto_define.parse_dictionary_content") as mock:
+    with patch("autodefine_cn_vn.auto_fill.parse_dictionary_content") as mock:
         yield mock
 
 
 @pytest.fixture
 def mock_notify():
     """Mock notify function."""
-    with patch("autodefine_cn_vn.auto_define.notify") as mock:
+    with patch("autodefine_cn_vn.auto_fill.notify") as mock:
         yield mock
 
 
 class TestAutoDefine:
-    """Tests for auto_define function."""
+    """Tests for auto_fill function."""
 
     def test_fills_fields_with_fetched_data(
         self, mock_editor, mock_fetch_webpage, mock_parse_dictionary_content, mock_notify
     ):
-        """Test that auto_define fills fields with data fetched from the dictionary."""
+        """Test that auto_fill fills fields with data fetched from the dictionary."""
         mock_fetch_webpage.return_value = "<html>dictionary content</html>"
         mock_parse_dictionary_content.return_value = {
             "pinyin": "nǐhǎo",
             "vietnamese": ["xin chào"],
         }
 
-        auto_define(mock_editor)
+        auto_fill(mock_editor)
 
         # Check that fields were filled with fetched data
         assert mock_editor.note.fields[1] == "nǐhǎo"
@@ -513,10 +513,10 @@ class TestAutoDefine:
         assert "你好" in mock_notify.call_args[0][0]
 
     def test_shows_error_when_no_chinese_text(self, mock_editor, mock_notify):
-        """Test that auto_define shows error when no Chinese text found."""
+        """Test that auto_fill shows error when no Chinese text found."""
         mock_editor.note.fields[0] = ""  # Empty Chinese field
 
-        auto_define(mock_editor)
+        auto_fill(mock_editor)
 
         mock_notify.assert_called_once()
         assert "No Chinese text" in mock_notify.call_args[0][0]
@@ -524,11 +524,11 @@ class TestAutoDefine:
     def test_shows_warning_when_no_data_found(
         self, mock_editor, mock_fetch_webpage, mock_parse_dictionary_content, mock_notify
     ):
-        """Test that auto_define shows warning when no data is found."""
+        """Test that auto_fill shows warning when no data is found."""
         mock_fetch_webpage.return_value = "<html>empty content</html>"
         mock_parse_dictionary_content.return_value = {"pinyin": "", "vietnamese": []}
 
-        auto_define(mock_editor)
+        auto_fill(mock_editor)
 
         # Check that warning notification was shown
         mock_notify.assert_called_once()
@@ -536,14 +536,14 @@ class TestAutoDefine:
         assert "你好" in mock_notify.call_args[0][0]
 
     def test_handles_http_error(self, mock_editor, mock_fetch_webpage, mock_notify):
-        """Test that auto_define handles HTTP errors gracefully."""
+        """Test that auto_fill handles HTTP errors gracefully."""
         import urllib.error
 
         mock_fetch_webpage.side_effect = urllib.error.HTTPError(
             url="http://test.com", code=404, msg="Not Found", hdrs={}, fp=None
         )
 
-        auto_define(mock_editor)
+        auto_fill(mock_editor)
 
         # Check that error notification was shown
         mock_notify.assert_called_once()
@@ -551,12 +551,12 @@ class TestAutoDefine:
         assert "你好" in mock_notify.call_args[0][0]
 
     def test_handles_url_error(self, mock_editor, mock_fetch_webpage, mock_notify):
-        """Test that auto_define handles network errors gracefully."""
+        """Test that auto_fill handles network errors gracefully."""
         import urllib.error
 
         mock_fetch_webpage.side_effect = urllib.error.URLError("Connection refused")
 
-        auto_define(mock_editor)
+        auto_fill(mock_editor)
 
         # Check that error notification was shown
         mock_notify.assert_called_once()
@@ -564,10 +564,10 @@ class TestAutoDefine:
         assert "你好" in mock_notify.call_args[0][0]
 
     def test_handles_unexpected_error(self, mock_editor, mock_fetch_webpage, mock_notify):
-        """Test that auto_define handles unexpected errors gracefully."""
+        """Test that auto_fill handles unexpected errors gracefully."""
         mock_fetch_webpage.side_effect = Exception("Unexpected error")
 
-        auto_define(mock_editor)
+        auto_fill(mock_editor)
 
         # Check that error notification was shown
         mock_notify.assert_called_once()
@@ -577,14 +577,14 @@ class TestAutoDefine:
     def test_uses_correct_url_and_timeout(
         self, mock_editor, mock_fetch_webpage, mock_parse_dictionary_content, mock_notify
     ):
-        """Test that auto_define uses correct URL and timeout from config."""
+        """Test that auto_fill uses correct URL and timeout from config."""
         mock_fetch_webpage.return_value = "<html>content</html>"
         mock_parse_dictionary_content.return_value = {
             "pinyin": "nǐhǎo",
             "vietnamese": ["xin chào"],
         }
 
-        auto_define(mock_editor)
+        auto_fill(mock_editor)
 
         # Verify fetch_webpage was called with correct arguments
         expected_url = "http://2.vndic.net/index.php?word=%E4%BD%A0%E5%A5%BD&dict=cn_vi"

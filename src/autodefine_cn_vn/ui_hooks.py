@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from anki.hooks import addHook
 
-from autodefine_cn_vn.auto_define import auto_define
+from autodefine_cn_vn.auto_fill import auto_fill
 from autodefine_cn_vn.config_manager import ConfigManager
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ def setup_editor_buttons(buttons: list[str], editor: "Editor") -> list[str]:
     button = editor.addButton(
         icon=None,
         cmd="autodefine_cn_vn",
-        func=lambda ed: ed.saveNow(lambda: auto_define(ed)),
+        func=lambda ed: ed.saveNow(lambda: auto_fill(ed)),
         tip=f"AutoDefine Chinese-Vietnamese ({shortcut if shortcut else 'no shortcut'})",
         label="自動",  # "Auto" in Chinese
         keys=shortcut if shortcut else "",

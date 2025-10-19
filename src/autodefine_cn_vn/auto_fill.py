@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from aqt.editor import Editor
 
 
-def auto_define(editor: "Editor") -> None:
+def auto_fill(editor: "Editor") -> None:
     """Auto-fill fields with fetched pinyin and Vietnamese definition.
 
     Fetches the Chinese-Vietnamese dictionary page for the Chinese text
