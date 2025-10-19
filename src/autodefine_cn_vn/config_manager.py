@@ -7,13 +7,17 @@ from aqt import mw
 
 @dataclass(frozen=True)
 class FieldMapping:
-    """Field name mappings for Anki note fields."""
+    """Field name mappings for Anki note fields.
+
+    Only chinese_field is required. Other fields are optional and will be
+    skipped if not configured (None or empty string).
+    """
 
     chinese_field: str
-    pinyin_field: str
-    vietnamese_field: str
-    audio_field: str
-    sentence_field: str
+    pinyin_field: str | None = None
+    vietnamese_field: str | None = None
+    audio_field: str | None = None
+    sentence_field: str | None = None
 
 
 @dataclass(frozen=True)

@@ -100,3 +100,22 @@ class TestConfigManager:
 
         assert mock_mw.addonManager.getConfig.call_count == initial_call_count + 1
         assert config_manager._config.field_mapping.chinese_field == "UpdatedChinese"
+
+    def test_optional_fields_default_to_none(self, mock_mw):
+        """Test that optional fields default to None when not provided in config."""
+        mock_mw.addonManager.getConfig.return_value = {
+            "version": "v1",
+            "field_mapping": {
+                "chinese_field": "Chinese",
+            },
+            "shortcuts": {"auto_define_shortcut": "Ctrl+Alt+D"},
+        }
+
+        config_manager = ConfigManager()
+        field_mapping = config_manager.get_field_mapping()
+
+        assert field_mapping.chinese_field == "Chinese"
+        assert field_mapping.pinyin_field is None
+        assert field_mapping.vietnamese_field is None
+        assert field_mapping.audio_field is None
+        assert field_mapping.sentence_field is None

@@ -188,6 +188,16 @@ class TestFillPinyinField:
         assert result is False
         mock_editor.loadNote.assert_not_called()
 
+    def test_returns_false_when_field_not_configured(self, mock_editor):
+        """Test that fill_pinyin_field returns False when pinyin_field is not configured."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        field_mapping = FieldMapping(chinese_field="Chinese", pinyin_field=None)
+
+        result = fill_pinyin_field(mock_editor, parsed_data, field_mapping)
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
 
 class TestFillVietnameseField:
     """Tests for fill_vietnamese_field helper function."""
@@ -216,6 +226,16 @@ class TestFillVietnameseField:
         parsed_data = {"pinyin": "nǐhǎo"}
 
         result = fill_vietnamese_field(mock_editor, parsed_data, get_field_mapping())
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+    def test_returns_false_when_field_not_configured(self, mock_editor):
+        """Test that fill_vietnamese_field returns False when vietnamese_field is not configured."""
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        field_mapping = FieldMapping(chinese_field="Chinese", vietnamese_field=None)
+
+        result = fill_vietnamese_field(mock_editor, parsed_data, field_mapping)
 
         assert result is False
         mock_editor.loadNote.assert_not_called()
@@ -296,6 +316,16 @@ class TestFillSentenceField:
         parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
 
         result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "你好")
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
+
+    def test_returns_false_when_field_not_configured(self, mock_editor):
+        """Test that fill_sentence_field returns False when sentence_field is not configured."""
+        parsed_data = {"sentences": [{"chinese": "你好吗？", "vietnamese": "Bạn khỏe không?"}]}
+        field_mapping = FieldMapping(chinese_field="Chinese", sentence_field=None)
+
+        result = fill_sentence_field(mock_editor, parsed_data, field_mapping, "你好")
 
         assert result is False
         mock_editor.loadNote.assert_not_called()
@@ -416,6 +446,27 @@ class TestFillAudioField:
             mock_notify.assert_called_once()
             assert "Could not download audio" in mock_notify.call_args[0][0]
             mock_editor.loadNote.assert_not_called()
+
+    def test_returns_false_when_field_not_configured(self, mock_editor):
+        """Test that fill_audio_field returns False when audio_field is not configured."""
+        parsed_data = {
+            "pinyin": "nǐhǎo",
+            "vietnamese": "xin chào",
+            "audio_url": "http://example.com/audio.mp3",
+        }
+        field_mapping = FieldMapping(chinese_field="Chinese", audio_field=None)
+
+        result = fill_audio_field(
+            mock_editor,
+            parsed_data,
+            field_mapping,
+            "你好",
+            "http://2.vndic.net/index.php?word={}&dict=cn_vi",
+            10,
+        )
+
+        assert result is False
+        mock_editor.loadNote.assert_not_called()
 
 
 @pytest.fixture

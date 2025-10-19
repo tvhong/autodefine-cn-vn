@@ -25,7 +25,8 @@
 - [x] Upgrade version of anki and aqt to 25.9.x
 - [x] Add multiple sample sentences
 - [x] Add multiple definitions
-- [ ] Allow empty "field" for optional configs such as audio and sample sentences. Only require "chinese" field.
+- [x] Allow empty "field" for optional configs such as audio and sample sentences. Only require "chinese" field.
+- [ ] Should use `<br>` to break vietnamese definitions instead of `\n`
 - [ ] Separate fetcher and parser
 - [ ] Fix shortcut
 - [ ] Add justfile command to link to addonfolder on mac

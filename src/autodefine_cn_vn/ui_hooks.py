@@ -128,6 +128,10 @@ def fill_pinyin_field(
     Returns:
         bool: True if pinyin was filled, False otherwise
     """
+    # Skip if field not configured
+    if not field_mapping.pinyin_field:
+        return False
+
     pinyin = parsed_data.get("pinyin", "")
     if pinyin:
         insert_into_field(
@@ -153,6 +157,10 @@ def fill_vietnamese_field(
     Returns:
         bool: True if vietnamese was filled, False otherwise
     """
+    # Skip if field not configured
+    if not field_mapping.vietnamese_field:
+        return False
+
     vietnamese = parsed_data.get("vietnamese", "")
     if vietnamese:
         insert_into_field(
@@ -182,6 +190,10 @@ def fill_sentence_field(
     Returns:
         bool: True if sentence was filled, False otherwise
     """
+    # Skip if field not configured
+    if not field_mapping.sentence_field:
+        return False
+
     sentences = parsed_data.get("sentences", [])
     if not sentences:
         return False
@@ -229,6 +241,10 @@ def fill_audio_field(
     Returns:
         bool: True if audio was filled, False otherwise
     """
+    # Skip if field not configured
+    if not field_mapping.audio_field:
+        return False
+
     audio_url = parsed_data.get("audio_url", "")
     if not audio_url or not editor.note:
         return False
