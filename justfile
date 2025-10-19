@@ -67,6 +67,10 @@ build: clean-build
 run-anki-macos: build
     /Applications/Anki.app/Contents/MacOS/launcher -p Test
 
+# Link addon to Anki's addon folder for development (macOS)
+link-to-anki: build
+    uv run python scripts/link_to_anki.py --yes
+
 # Get current version from pyproject.toml
 version:
     @uv run python scripts/release.py --help | grep "Current version" || grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/'
