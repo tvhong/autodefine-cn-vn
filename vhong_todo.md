@@ -28,6 +28,7 @@
 - [x] Allow empty "field" for optional configs such as audio and sample sentences. Only require "chinese" field.
 - [x] Should use `<br>` to break vietnamese definitions instead of `\n`
 - [x] Separate fetcher and parser
+- [ ] Parser logic should have sub-functions like parse_pinyin, parse_vietnamese etc.
 - [ ] Move auto_define function into its own file, called auto_define.py or something
   - [ ] Let's find a good name for this function first
 - [ ] Add justfile command to link to addonfolder on mac (link from the build folder to Mac's Application)
