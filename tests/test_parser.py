@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-import pytest
-
 from autodefine_cn_vn.parser import parse_dictionary_content, parse_sample_sentences
 
 
