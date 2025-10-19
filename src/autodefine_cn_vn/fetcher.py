@@ -106,8 +106,8 @@ def parse_dictionary_content(html_content: str) -> DictionaryContent:
                 if definition:
                     vietnamese_definitions.append(definition)
 
-    # Join all definitions with newlines
-    vietnamese = "\n".join(vietnamese_definitions)
+    # Join all definitions with HTML line breaks
+    vietnamese = "<br>".join(vietnamese_definitions)
 
     # Extract audio URL from soundManager.play() call
     audio_url = ""

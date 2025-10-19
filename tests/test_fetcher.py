@@ -301,8 +301,8 @@ class TestParseDictionaryContent:
         assert "anh; chị; ông; bà; mày (chỉ một người)" in vietnamese
         # Second definition: ta; người ta
         assert "ta; người ta" in vietnamese
-        # Both definitions should be separated (e.g., by newline)
-        definitions = vietnamese.split("\n")
+        # Both definitions should be separated by HTML line breaks
+        definitions = vietnamese.split("<br>")
         assert len(definitions) >= 2, f"Expected at least 2 definitions, got {len(definitions)}"
 
     def test_parse_audio_url_from_html(self):

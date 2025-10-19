@@ -26,11 +26,11 @@
 - [x] Add multiple sample sentences
 - [x] Add multiple definitions
 - [x] Allow empty "field" for optional configs such as audio and sample sentences. Only require "chinese" field.
-- [ ] Should use `<br>` to break vietnamese definitions instead of `\n`
+- [x] Should use `<br>` to break vietnamese definitions instead of `\n`
 - [ ] Separate fetcher and parser
-- [ ] Fix shortcut
 - [ ] Add justfile command to link to addonfolder on mac
   - `ln -s $HOME/workplace/autodefine-cn-vn/build/autodefine_cn_vn  $HOME/Library/Application\ Support/Anki2/addons21/autodefine_cn_vn`
+- [ ] Fix shortcut
 - [x] Add justfile command to build and run launcher script
 
 ### 0.2.x: Support multiple definitions
