@@ -24,17 +24,18 @@
 - [x] Notify should get the previous line number as well
 - [x] Upgrade version of anki and aqt to 25.9.x
 - [x] Add multiple sample sentences
-- [ ] Add multiple definitions
-- [ ] Allow empty "field" for optional configs such as audio and sample sentences
-- [ ] Fix shortcut
+- [x] Add multiple definitions
+- [ ] Allow empty "field" for optional configs such as audio and sample sentences. Only require "chinese" field.
 - [ ] Separate fetcher and parser
+- [ ] Fix shortcut
 - [ ] Add justfile command to link to addonfolder on mac
+  - `ln -s $HOME/workplace/autodefine-cn-vn/build/autodefine_cn_vn  $HOME/Library/Application\ Support/Anki2/addons21/autodefine_cn_vn`
 - [x] Add justfile command to build and run launcher script
 
 ### 0.2.x: Support multiple definitions
 
-- [ ] Parse all definitions
-- [ ] Pass all of them into the field
+- [x] Parse all definitions
+- [x] Pass all of them into the field
 
 ## 0.x: Nice to have features
 

@@ -287,6 +287,24 @@ class TestParseDictionaryContent:
         assert "chị" in result["vietnamese"]
         assert "称对方(一个人)" in result["vietnamese"]
 
+    def test_parse_multiple_definitions(self):
+        """Test parsing dictionary content with multiple definitions."""
+        # The word 你 has 2 definitions in the real HTML
+        asset_path = Path(__file__).parent / "assets" / "vndic_net_ni.html"
+        html_content = asset_path.read_text(encoding="utf-8")
+
+        result = parse_dictionary_content(html_content)
+
+        # Should contain both definitions
+        vietnamese = result["vietnamese"]
+        # First definition: anh; chị; ông; bà; mày (chỉ một người)
+        assert "anh; chị; ông; bà; mày (chỉ một người)" in vietnamese
+        # Second definition: ta; người ta
+        assert "ta; người ta" in vietnamese
+        # Both definitions should be separated (e.g., by newline)
+        definitions = vietnamese.split("\n")
+        assert len(definitions) >= 2, f"Expected at least 2 definitions, got {len(definitions)}"
+
     def test_parse_audio_url_from_html(self):
         """Test parsing audio URL from soundManager.play() call."""
         html_content = """

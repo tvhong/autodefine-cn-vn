@@ -91,18 +91,23 @@ def parse_dictionary_content(html_content: str) -> DictionaryContent:
         if pinyin.startswith("[") and pinyin.endswith("]"):
             pinyin = pinyin[1:-1]
 
-    # Extract Vietnamese definition by finding the TD after the one with the marker image
-    vietnamese = ""
-    # Find the img tag with the specific marker image
-    marker_img = soup.find("img", src=lambda x: bool(x) and "img/dict/CB1FF077.png" in x)
-    if marker_img:
+    # Extract all Vietnamese definitions by finding all TDs after marker images
+    vietnamese_definitions = []
+    # Find all img tags with the specific marker image
+    marker_imgs = soup.find_all("img", src=lambda x: bool(x) and "img/dict/CB1FF077.png" in x)
+    for marker_img in marker_imgs:
         # Find the parent TD of the marker image
         marker_td = marker_img.find_parent("td")
         if marker_td:
             # Get the next sibling TD which contains the Vietnamese definition
             next_td = marker_td.find_next_sibling("td")
             if next_td:
-                vietnamese = next_td.get_text(strip=True)
+                definition = next_td.get_text(strip=True)
+                if definition:
+                    vietnamese_definitions.append(definition)
+
+    # Join all definitions with newlines
+    vietnamese = "\n".join(vietnamese_definitions)
 
     # Extract audio URL from soundManager.play() call
     audio_url = ""
