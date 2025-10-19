@@ -54,10 +54,14 @@ def fetch_webpage(url: str, timeout: int) -> str:
     Raises:
         urllib.error.URLError: If there's a network error or timeout
         urllib.error.HTTPError: If the server returns an HTTP error (404, 500, etc.)
+
+    Note:
+        Uses errors='replace' to handle malformed UTF-8 sequences in HTML meta tags.
+        Invalid bytes are replaced with the Unicode replacement character (�).
     """
     with urllib.request.urlopen(url, timeout=timeout) as response:
         content_bytes = response.read()
-        return content_bytes.decode("utf-8")
+        return content_bytes.decode("utf-8", errors="replace")
 
 
 def parse_dictionary_content(html_content: str) -> DictionaryContent:

@@ -138,6 +138,35 @@ class TestFetchWebpage:
         call_args = mock_urlopen.call_args
         assert call_args[1]["timeout"] == timeout
 
+    @patch("autodefine_cn_vn.fetcher.urllib.request.urlopen")
+    def test_fetch_webpage_handles_malformed_utf8(self, mock_urlopen):
+        """Test that fetch_webpage handles malformed UTF-8 sequences."""
+        # Create content with invalid UTF-8 bytes (incomplete sequence)
+        # This simulates the issue found with words like 斯 and 讨厌
+        malformed_content = (
+            b"<html><head><meta charset=utf-8><title>"
+            b"\xe6\x96"  # Incomplete UTF-8 sequence (should be 3 bytes)
+            b'</title></head><body><font color="#7F0000">[s\xc4\xab]</font>'
+            b'<img src="img/dict/CB1FF077.png"><td>test</td></body></html>'
+        )
+        mock_response = MagicMock()
+        mock_response.read.return_value = malformed_content
+        mock_response.__enter__.return_value = mock_response
+        mock_urlopen.return_value = mock_response
+
+        url = "http://2.vndic.net/index.php?word=斯&dict=cn_vi"
+        timeout = 10
+
+        # Should not raise UnicodeDecodeError
+        result = fetch_webpage(url, timeout)
+
+        # Result should contain replacement characters for invalid bytes
+        assert isinstance(result, str)
+        assert "<html>" in result
+        assert 'font color="#7F0000"' in result
+        # Invalid bytes should be replaced with Unicode replacement character
+        assert "\ufffd" in result or "�" in result
+
 
 class TestParseDictionaryContent:
     """Test suite for parsing dictionary content."""
