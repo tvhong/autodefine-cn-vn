@@ -183,10 +183,9 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == "gōngjīn"
-        assert (
-            result["vietnamese"]
-            == "ki-lô-gam。国际公制重量或质量主单位，一公斤等于一千克，合二市斤。"
-        )
+        assert result["vietnamese"] == [
+            "ki-lô-gam。国际公制重量或质量主单位，一公斤等于一千克，合二市斤。"
+        ]
         assert result["audio_url"] == ""
 
     def test_parse_content_with_extra_whitespace(self):
@@ -201,7 +200,7 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == "nǐhǎo"
-        assert result["vietnamese"] == "xin chào"
+        assert result["vietnamese"] == ["xin chào"]
 
     def test_parse_content_missing_pinyin(self):
         """Test parsing content when pinyin is missing."""
@@ -215,7 +214,7 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == ""
-        assert result["vietnamese"] == "xin chào"
+        assert result["vietnamese"] == ["xin chào"]
 
     def test_parse_content_missing_vietnamese(self):
         """Test parsing content when Vietnamese definition is missing."""
@@ -229,7 +228,7 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == "nǐhǎo"
-        assert result["vietnamese"] == ""
+        assert result["vietnamese"] == []
 
     def test_parse_content_missing_table(self):
         """Test parsing content when TABLE element is missing."""
@@ -238,7 +237,7 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == ""
-        assert result["vietnamese"] == ""
+        assert result["vietnamese"] == []
 
     def test_parse_empty_html(self):
         """Test parsing empty HTML."""
@@ -247,7 +246,7 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == ""
-        assert result["vietnamese"] == ""
+        assert result["vietnamese"] == []
 
     def test_parse_real_dictionary_page(self):
         """Test parsing a real dictionary page HTML (公斤 = kilogram)."""
@@ -258,8 +257,9 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == "gōngjīn"
-        assert "ki-lô-gam" in result["vietnamese"]
-        assert "国际公制重量或质量主单位" in result["vietnamese"]
+        vietnamese_text = " ".join(result["vietnamese"])
+        assert "ki-lô-gam" in vietnamese_text
+        assert "国际公制重量或质量主单位" in vietnamese_text
 
     def test_parse_real_dictionary_page_nimen(self):
         """Test parsing a real dictionary page HTML (你们 = you plural)."""
@@ -270,9 +270,10 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == "nǐ·men"
-        assert "các ông" in result["vietnamese"]
-        assert "các bà" in result["vietnamese"]
-        assert "代词" in result["vietnamese"]
+        vietnamese_text = " ".join(result["vietnamese"])
+        assert "các ông" in vietnamese_text
+        assert "các bà" in vietnamese_text
+        assert "代词" in vietnamese_text
 
     def test_parse_real_dictionary_page_ni(self):
         """Test parsing a real dictionary page HTML (你 = you)."""
@@ -283,9 +284,10 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == "nǐ"
-        assert "anh" in result["vietnamese"]
-        assert "chị" in result["vietnamese"]
-        assert "称对方(一个人)" in result["vietnamese"]
+        vietnamese_text = " ".join(result["vietnamese"])
+        assert "anh" in vietnamese_text
+        assert "chị" in vietnamese_text
+        assert "称对方(一个人)" in vietnamese_text
 
     def test_parse_multiple_definitions(self):
         """Test parsing dictionary content with multiple definitions."""
@@ -295,15 +297,15 @@ class TestParseDictionaryContent:
 
         result = parse_dictionary_content(html_content)
 
-        # Should contain both definitions
+        # Should contain both definitions as separate list items
         vietnamese = result["vietnamese"]
+        vietnamese_text = " ".join(vietnamese)
         # First definition: anh; chị; ông; bà; mày (chỉ một người)
-        assert "anh; chị; ông; bà; mày (chỉ một người)" in vietnamese
+        assert "anh; chị; ông; bà; mày (chỉ một người)" in vietnamese_text
         # Second definition: ta; người ta
-        assert "ta; người ta" in vietnamese
-        # Both definitions should be separated by HTML line breaks
-        definitions = vietnamese.split("<br>")
-        assert len(definitions) >= 2, f"Expected at least 2 definitions, got {len(definitions)}"
+        assert "ta; người ta" in vietnamese_text
+        # Should have multiple definitions in the list
+        assert len(vietnamese) >= 2, f"Expected at least 2 definitions, got {len(vietnamese)}"
 
     def test_parse_audio_url_from_html(self):
         """Test parsing audio URL from soundManager.play() call."""
@@ -333,7 +335,8 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == "nǐ·men"
-        assert "các ông" in result["vietnamese"]
+        vietnamese_text = " ".join(result["vietnamese"])
+        assert "các ông" in vietnamese_text
         assert result["audio_url"] == "/mp3.php?id=E4BDA0E4BBAC&dir=390&lang=cn&"
 
     def test_parse_dictionary_content_with_sentences(self):
@@ -362,7 +365,7 @@ class TestParseDictionaryContent:
         result = parse_dictionary_content(html_content)
 
         assert result["pinyin"] == "nǐhǎo"
-        assert result["vietnamese"] == "xin chào"
+        assert result["vietnamese"] == ["xin chào"]
         assert result["sentences"] == []
 
     def test_parse_dictionary_content_missing_chinese_word(self):
@@ -378,7 +381,7 @@ class TestParseDictionaryContent:
 
         # Should still parse other fields, but sentences will be empty
         assert result["pinyin"] == "nǐhǎo"
-        assert result["vietnamese"] == "xin chào"
+        assert result["vietnamese"] == ["xin chào"]
         assert result["sentences"] == []
 
 

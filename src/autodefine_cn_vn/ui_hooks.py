@@ -161,11 +161,13 @@ def fill_vietnamese_field(
     if not field_mapping.vietnamese_field:
         return False
 
-    vietnamese = parsed_data.get("vietnamese", "")
-    if vietnamese:
+    vietnamese_list = parsed_data.get("vietnamese", [])
+    if vietnamese_list:
+        # Join multiple definitions with HTML line breaks
+        vietnamese_text = "<br>".join(vietnamese_list)
         insert_into_field(
             editor,
-            vietnamese,
+            vietnamese_text,
             field_mapping.vietnamese_field,
             overwrite=True,
         )

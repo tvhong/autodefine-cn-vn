@@ -18,7 +18,7 @@ class DictionaryContent(TypedDict):
     """Structure for parsed dictionary content."""
 
     pinyin: str
-    vietnamese: str
+    vietnamese: list[str]
     audio_url: str
     sentences: list[SampleSentence]
 
@@ -106,8 +106,8 @@ def parse_dictionary_content(html_content: str) -> DictionaryContent:
                 if definition:
                     vietnamese_definitions.append(definition)
 
-    # Join all definitions with HTML line breaks
-    vietnamese = "<br>".join(vietnamese_definitions)
+    # Return list of Vietnamese definitions (UI layer will handle joining)
+    vietnamese = vietnamese_definitions
 
     # Extract audio URL from soundManager.play() call
     audio_url = ""

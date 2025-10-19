@@ -28,8 +28,11 @@
 - [x] Allow empty "field" for optional configs such as audio and sample sentences. Only require "chinese" field.
 - [x] Should use `<br>` to break vietnamese definitions instead of `\n`
 - [ ] Separate fetcher and parser
-- [ ] Add justfile command to link to addonfolder on mac
+- [ ] Move auto_define function into its own file, called auto_define.py or something
+  - [ ] Let's find a good name for this function first
+- [ ] Add justfile command to link to addonfolder on mac (link from the build folder to Mac's Application)
   - `ln -s $HOME/workplace/autodefine-cn-vn/build/autodefine_cn_vn  $HOME/Library/Application\ Support/Anki2/addons21/autodefine_cn_vn`
+  - Maybe does a search in Mac's Application folder first and ask user potential locations
 - [ ] Fix shortcut
 - [x] Add justfile command to build and run launcher script
 

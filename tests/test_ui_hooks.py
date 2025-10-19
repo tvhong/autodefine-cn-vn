@@ -162,7 +162,7 @@ class TestFillPinyinField:
 
     def test_fills_pinyin_field_when_present(self, mock_editor):
         """Test that fill_pinyin_field fills the pinyin field when data is present."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ["xin chào"]}
 
         result = fill_pinyin_field(mock_editor, parsed_data, get_field_mapping())
 
@@ -172,7 +172,7 @@ class TestFillPinyinField:
 
     def test_returns_false_when_pinyin_empty(self, mock_editor):
         """Test that fill_pinyin_field returns False when pinyin is empty."""
-        parsed_data = {"pinyin": "", "vietnamese": "xin chào"}
+        parsed_data = {"pinyin": "", "vietnamese": ["xin chào"]}
 
         result = fill_pinyin_field(mock_editor, parsed_data, get_field_mapping())
 
@@ -181,7 +181,7 @@ class TestFillPinyinField:
 
     def test_returns_false_when_pinyin_missing(self, mock_editor):
         """Test that fill_pinyin_field returns False when pinyin key is missing."""
-        parsed_data = {"vietnamese": "xin chào"}
+        parsed_data = {"vietnamese": ["xin chào"]}
 
         result = fill_pinyin_field(mock_editor, parsed_data, get_field_mapping())
 
@@ -190,7 +190,7 @@ class TestFillPinyinField:
 
     def test_returns_false_when_field_not_configured(self, mock_editor):
         """Test that fill_pinyin_field returns False when pinyin_field is not configured."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ["xin chào"]}
         field_mapping = FieldMapping(chinese_field="Chinese", pinyin_field=None)
 
         result = fill_pinyin_field(mock_editor, parsed_data, field_mapping)
@@ -204,7 +204,7 @@ class TestFillVietnameseField:
 
     def test_fills_vietnamese_field_when_present(self, mock_editor):
         """Test that fill_vietnamese_field fills the vietnamese field when data is present."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ["xin chào"]}
 
         result = fill_vietnamese_field(mock_editor, parsed_data, get_field_mapping())
 
@@ -214,7 +214,7 @@ class TestFillVietnameseField:
 
     def test_returns_false_when_vietnamese_empty(self, mock_editor):
         """Test that fill_vietnamese_field returns False when vietnamese is empty."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ""}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": []}
 
         result = fill_vietnamese_field(mock_editor, parsed_data, get_field_mapping())
 
@@ -232,7 +232,7 @@ class TestFillVietnameseField:
 
     def test_returns_false_when_field_not_configured(self, mock_editor):
         """Test that fill_vietnamese_field returns False when vietnamese_field is not configured."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ["xin chào"]}
         field_mapping = FieldMapping(chinese_field="Chinese", vietnamese_field=None)
 
         result = fill_vietnamese_field(mock_editor, parsed_data, field_mapping)
@@ -248,7 +248,7 @@ class TestFillSentenceField:
         """Test that fill_sentence_field fills the sentence field with all sentences."""
         parsed_data = {
             "pinyin": "nǐhǎo",
-            "vietnamese": "xin chào",
+            "vietnamese": ["xin chào"],
             "sentences": [
                 {"chinese": "你好吗？", "vietnamese": "Bạn khỏe không?"},
                 {"chinese": "你好世界。", "vietnamese": "Xin chào thế giới."},
@@ -304,7 +304,7 @@ class TestFillSentenceField:
 
     def test_returns_false_when_sentences_empty(self, mock_editor):
         """Test that fill_sentence_field returns False when sentences list is empty."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào", "sentences": []}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ["xin chào"], "sentences": []}
 
         result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "你好")
 
@@ -313,7 +313,7 @@ class TestFillSentenceField:
 
     def test_returns_false_when_sentences_missing(self, mock_editor):
         """Test that fill_sentence_field returns False when sentences key is missing."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ["xin chào"]}
 
         result = fill_sentence_field(mock_editor, parsed_data, get_field_mapping(), "你好")
 
@@ -338,7 +338,7 @@ class TestFillAudioField:
         """Test that fill_audio_field downloads and fills audio when URL is present."""
         parsed_data = {
             "pinyin": "nǐhǎo",
-            "vietnamese": "xin chào",
+            "vietnamese": ["xin chào"],
             "audio_url": "http://example.com/audio.mp3",
         }
 
@@ -367,7 +367,7 @@ class TestFillAudioField:
 
     def test_returns_false_when_audio_url_empty(self, mock_editor):
         """Test that fill_audio_field returns False when audio URL is empty."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào", "audio_url": ""}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ["xin chào"], "audio_url": ""}
 
         result = fill_audio_field(
             mock_editor,
@@ -383,7 +383,7 @@ class TestFillAudioField:
 
     def test_returns_false_when_audio_url_missing(self, mock_editor):
         """Test that fill_audio_field returns False when audio_url key is missing."""
-        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": "xin chào"}
+        parsed_data = {"pinyin": "nǐhǎo", "vietnamese": ["xin chào"]}
 
         result = fill_audio_field(
             mock_editor,
@@ -404,7 +404,7 @@ class TestFillAudioField:
 
         parsed_data = {
             "pinyin": "nǐhǎo",
-            "vietnamese": "xin chào",
+            "vietnamese": ["xin chào"],
             "audio_url": "http://example.com/audio.mp3",
         }
 
@@ -423,7 +423,7 @@ class TestFillAudioField:
         """Test that fill_audio_field returns False and shows notification when download fails."""
         parsed_data = {
             "pinyin": "nǐhǎo",
-            "vietnamese": "xin chào",
+            "vietnamese": ["xin chào"],
             "audio_url": "http://example.com/audio.mp3",
         }
 
@@ -451,7 +451,7 @@ class TestFillAudioField:
         """Test that fill_audio_field returns False when audio_field is not configured."""
         parsed_data = {
             "pinyin": "nǐhǎo",
-            "vietnamese": "xin chào",
+            "vietnamese": ["xin chào"],
             "audio_url": "http://example.com/audio.mp3",
         }
         field_mapping = FieldMapping(chinese_field="Chinese", audio_field=None)
@@ -500,7 +500,7 @@ class TestAutoDefine:
         mock_fetch_webpage.return_value = "<html>dictionary content</html>"
         mock_parse_dictionary_content.return_value = {
             "pinyin": "nǐhǎo",
-            "vietnamese": "xin chào",
+            "vietnamese": ["xin chào"],
         }
 
         auto_define(mock_editor)
@@ -528,7 +528,7 @@ class TestAutoDefine:
     ):
         """Test that auto_define shows warning when no data is found."""
         mock_fetch_webpage.return_value = "<html>empty content</html>"
-        mock_parse_dictionary_content.return_value = {"pinyin": "", "vietnamese": ""}
+        mock_parse_dictionary_content.return_value = {"pinyin": "", "vietnamese": []}
 
         auto_define(mock_editor)
 
@@ -583,7 +583,7 @@ class TestAutoDefine:
         mock_fetch_webpage.return_value = "<html>content</html>"
         mock_parse_dictionary_content.return_value = {
             "pinyin": "nǐhǎo",
-            "vietnamese": "xin chào",
+            "vietnamese": ["xin chào"],
         }
 
         auto_define(mock_editor)
